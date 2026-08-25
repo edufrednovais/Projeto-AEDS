@@ -13,23 +13,44 @@ public class tp1 {
 
 class Registro{
   int id;
-  String campFix;
-  String campVariavel;
+  
+  //campo Fixo
+  String homeTeam;
+  String awayTeam;
+
+
+  //campo Variave
+  String referee;
+
+  //campo data
   String data;
-  String lista;
-  float valor;
+
+  //lista com separador
+  String listaTimes;
+
+  //inteiro
+  int golsCasa;
+  int golsFora;
+
+  //campo variavel
+  String resultado;
+
   // edu vai ver o video do Kutova la ele explica isso
   DecimalFormat df = new DecimalFormat("#,##0.00");
 
   // Construtor
-  Registro(int id , String campFix, String campVariavel,String data,String lista,float valor){
+  Registro(int id , String homeTeam, String awayTeam,String referee,String data,String listaTimes , int golsCasa,int golsFora, String resultado){
     this.id = id;
-    this.campFix = campFix;
-    this.campVariavel = campVariavel;
+    this.homeTeam = homeTeam;
+    this.awayTeam = awayTeam;
+    this.referee = referee;
     // esse da data vamos ter q rever
     this.data = data;
-    this.lista = lista;
-    this.valor = valor;
+    this.listaTimes = listaTimes;
+    this.golsCasa = golsCasa;
+    this.golsFora = golsFora;
+    this.resultado = resultado;
+    
   }
 
   // Transforma objeto em bytes
@@ -37,11 +58,14 @@ class Registro{
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     DataOutputStream dos = new DataOutputStream(baos);
     dos.writeInt(id);
-    dos.writeUTF(campFix);
-    dos.writeUTF(campVariavel);
+    dos.writeUTF(homeTeam);
+    dos.writeUTF(awayTeam);
+    dos.writeUTF(referee);
     dos.writeUTF(data);
-    dos.writeUTF(lista);
-    dos.writeFloat(valor);
+    dos.writeUTF(listaTimes);
+    dos.writeInt(golsCasa);
+    dos.writeInt(golsFora);
+    dos.writeUTF(resultado);
 
     return baos.toByteArray();
   }
@@ -51,21 +75,27 @@ class Registro{
     ByteArrayInputStream bais = new ByteArrayInputStream(ba);
     DataInputStream dis = new DataInputStream(bais);
     id = dis.readInt();
-    campFix = dis.readUTF();
-    campVariavel  = dis.readUTF();
+    homeTeam = dis.readUTF();
+    awayTeam = dis.readUTF();
+    referee  = dis.readUTF();
     data = dis.readUTF();
-    lista = dis.readUTF();
-    valor = dis.readFloat();    
+    listaTimes = dis.readUTF();
+    golsCasa = dis.readInt(); 
+    golsFora = dis.readInt();
+    resultado = dis.readUTF();
   }
   // to String
 
   String ToString(){
     return "\nId: " + id + 
-    "\nCampFix: " + campFix +
-    "\nCampVariavel: " + campVariavel +
-    "\nData: " + data +
-    "\nLista: " + lista +
-    "\nValor: RS" + df.format(valor);
+      "\nTime da Casa: " + homeTeam +
+      "\nTime visitante: " + awayTeam +
+      "\nArbitro: " + referee +
+      "\nData: " + data +
+      "\nLista de Times: " + listaTimes +
+      "\nGols casa: " + golsCasa +
+      "\nGols fora: " + golsFora +
+      "\nResultados: " + resultado;
   }
 
 
