@@ -111,7 +111,7 @@ import java.io.RandomAccessFile;
 
 
 
-CargaCsv {
+Class CargaCsv {
   public static void carregar(String caminhoCsv, String caminhoBin)throws IOException{
     BufferedReader b = new BufferedReader(new FileReader(caminhoCsv));
     
