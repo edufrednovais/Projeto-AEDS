@@ -1,19 +1,26 @@
+
 import java.io.RandomAccessFile;
 import java.io.IOException;
 
 public class CRUD {
+
     // Este método recebe um Registro e grava ele no arquivo jogos.dat, Atenção com o esse arquivo cabeção
     // esse arquivo pode ser criado autmaticamente caso ele nao exista tipo o do kutsova sla
 
-    public static void CREATE(Registro registro) throws IOException {
+    public static void CRIATE(Registro registro) throws IOException {
 
         // Abre o arquivo jogos.dat.
-       // o r e de red leitura se voce souber ingles, e o w e de leitura por isso botei ai
+        // o r e de red leitura se voce souber ingles, e o w e de leitura por isso botei ai
         // se ele nao existir vai criar o arquivo
         RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "rw");
 
-       // essa funcao de baixo leva ele pro final do arquivo sempre inserindo no final, assim evitando que a gente perca as informacoes
+        // essa funcao de baixo leva ele pro final do arquivo sempre inserindo no final,
+        // assim evitando que a gente perca as informacoes
         arquivo.seek(arquivo.length());
+
+        // Quando criamos um registro, ele começa como ativo.
+        // false significa que o registro NÃO está apagado.
+        registro.lapide = false;
 
         // usei o metodo que voce criou no registo pra converter em byte
         byte[] dados = registro.toByteArray();
@@ -34,177 +41,169 @@ public class CRUD {
     // cara o read ele busca por id, so pra deixar claro
     public static Registro READ(int id) throws IOException {
 
-   
-    RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "r");
+        RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "r");
 
-    // Enquanto ainda existirem registros no arquivo
-    // getFilePointer() = posição atual dentro do arquivo
-    // length() = tamanho total do arquivo
-    // acho que essas sao as principais pra voce entender oque eu fiz nesse caso 
-    while (arquivo.getFilePointer() < arquivo.length()) {
+        // Enquanto ainda existirem registros no arquivo
+        // getFilePointer() = posição atual dentro do arquivo
+        // length() = tamanho total do arquivo
+        // acho que essas sao as principais pra voce entender oque eu fiz nesse caso
+        while (arquivo.getFilePointer() < arquivo.length()) {
 
-        int tamanho = arquivo.readInt();
-       // acaba que o tamanho do arquivo a gente cria o vetor 
-        byte[] dados = new byte[tamanho];
+            int tamanho = arquivo.readInt();
 
-         arquivo.readFully(dados);
+            // acaba que o tamanho do arquivo a gente cria o vetor
+            byte[] dados = new byte[tamanho];
 
-        // Criei um Registro vazio temporariamente.
-        // a gente precisa de um objeto vazio pra colocar os dados do vetor la
-        
-        Registro registro = new Registro(0,"","","","","",0,0,"");
+            arquivo.readFully(dados);
 
-       // ai aqui a gente converte os bytes pra um novo tipo de registro 
-        registro.fromByteArray(dados);
+            // Criei um Registro vazio temporariamente.
+            // a gente precisa de um objeto vazio pra colocar os dados do vetor la
+            Registro registro = new Registro(0, "", "", "", "", "", 0, 0, "");
 
-        // Verifiquei se o ID do registro é o ID e oque a gente procura 
-        
-        if (registro.id == id) {
+            // ai aqui a gente converte os bytes pra um novo tipo de registro
+            registro.fromByteArray(dados);
 
-           // se a gente encontrar e melhor fexar o arquivo antes de retornar 
-            arquivo.close();
-            return registro;
+            // Verifiquei se o ID do registro é o ID e oque a gente procura
+            // Também verifico se o registro não está apagado pela lápide.
+            if (registro.id == id && !registro.lapide) {
+
+                // se a gente encontrar e melhor fexar o arquivo antes de retornar
+                arquivo.close();
+                return registro;
+            }
         }
+
+        // o arquivo nao tem o id que a gente queria
+        // ou o registro está marcado com lápide
+        arquivo.close();
+
+        return null;
     }
 
-    // o arquivo nao tem o id que a gente queria
-    arquivo.close();
 
-    return null;
-}
-// o update ele encontra o ID e substitui por um outro
-public static boolean UPDATE(int id, tp1.Registro novoRegistro)
-        throws IOException {
+    // o update ele encontra o ID e substitui por um outro
+    public static boolean UPDATE(int id, Registro novoRegistro)
+            throws IOException {
 
-     RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "r");
+        RandomAccessFile arquivo =
+                new RandomAccessFile("jogos.dat", "rw");
 
-     RandomAccessFile temporario = new RandomAccessFile("jogos_temp.dat", "rw");
+        // Variável para saber se o registro foi encontrado.
+        boolean encontrado = false;
 
-    // Variável para saber se o registro foi encontrado.
-    boolean encontrado = false;
+        // as coisas sao a mesma do Read
+        while (arquivo.getFilePointer() < arquivo.length()) {
 
-   // as coisas sao a mesma do Read
-    while (arquivo.getFilePointer() < arquivo.length()) {
-        int tamanho = arquivo.readInt();
+            // Guarda a posição onde começa o tamanho do registro.
+            long posicao = arquivo.getFilePointer();
 
-        byte[] dados = new byte[tamanho];
+            int tamanho = arquivo.readInt();
 
-        arquivo.readFully(dados);
+            byte[] dados = new byte[tamanho];
 
-        Registro registro = new Registro(0,"","","","","",0,0,"");
+            arquivo.readFully(dados);
 
-        registro.fromByteArray(dados);
+            Registro registro =
+                    new Registro(0, "", "", "", "", "", 0, 0, "");
 
-        if (registro.id == id) {
+            registro.fromByteArray(dados);
 
-            byte[] novosDados = novoRegistro.toByteArray();
+            // Verifica se encontramos o ID
+            // e se o registro ainda está ativo.
+            if (registro.id == id && !registro.lapide) {
 
-            temporario.writeInt(novosDados.length);
+                // Mantém o mesmo ID do registro original.
+                novoRegistro.id = id;
 
-            // Grava o novo registro.
-            temporario.write(novosDados);
+                // O novo registro também deve estar ativo.
+                novoRegistro.lapide = false;
 
-            // Indica que foi encontrado e atualiza.
-            encontrado = true;
+                byte[] novosDados = novoRegistro.toByteArray();
 
-        } else {
-           // esse else e pra se caso nao encontrarmos o registro que queremos atualizar a gente mantem o original 
-            temporario.writeInt(tamanho);
-            temporario.write(dados);
+                // Voltamos para o começo do registro.
+                arquivo.seek(posicao);
+
+                // Grava o novo tamanho.
+                arquivo.writeInt(novosDados.length);
+
+                // Grava o novo registro.
+                arquivo.write(novosDados);
+
+                // Indica que foi encontrado e atualiza.
+                encontrado = true;
+
+                // Como já encontramos o registro,
+                // podemos parar a procura.
+                break;
+            }
         }
+
+        arquivo.close();
+
+        return encontrado;
     }
 
-    arquivo.close();
-    temporario.close();
 
-    // Se encontrou o registro
-    if (encontrado) {
+    // DELETE
+    // procura um registro pelo ID e remove ele do arquivo.
+    // agora usamos uma LÁPIDE, então o registro não é realmente removido.
+    // ele continua no arquivo, mas fica marcado como apagado.
 
-        // Cria o objetos File para poder manipular
-        // os arquivos no sistema.
-        java.io.File original =new java.io.File("jogos.dat");
+    public static boolean excluir(int id) throws IOException {
 
-        java.io.File temporarioFile = new java.io.File("jogos_temp.dat");
+        // Abre o arquivo no modo "rw", pois vamos ler e também modificar.
+        RandomAccessFile arquivo =
+                new RandomAccessFile("jogos.dat", "rw");
 
-        // Apaga o arquivo original.
-        original.delete();
+        // Indica se encontrou o registro.
+        boolean encontrado = false;
 
-        // Renomeia o arquivo temporário para jogos.dat.
-        temporarioFile.renameTo(original);
-    } else {
+        // mesma coisa dos anteriores a checagem de tamanho
+        while (arquivo.getFilePointer() < arquivo.length()) {
 
-        // Se não encontrou o ID, apaga o arquivo temporário porque não precisa dele
-       
-        new java.io.File("jogos_temp.dat").delete();
-    }
-    return encontrado;
-}
+            // Guarda a posição onde começa o tamanho do registro.
+            long posicao = arquivo.getFilePointer();
 
-// DELETE
-// procura um registro pelo ID e remove ele do arquivo.
-// usei arquivo temporario pra ficar melhor(nao sei se pode ou nao usar arquivo temporario)
+            int tamanho = arquivo.readInt();
 
-public static boolean DELETE(int id) throws IOException {
+            byte[] dados = new byte[tamanho];
 
+            arquivo.readFully(dados);
 
-    RandomAccessFile arquivo =new RandomAccessFile("jogos.dat", "r");
+            Registro registro =
+                    new Registro(0, "", "", "", "", "", 0, 0, "");
 
+            registro.fromByteArray(dados);
 
-    RandomAccessFile temporario = new RandomAccessFile("jogos_temp.dat", "rw");
+            if (registro.id == id && !registro.lapide) {
 
-    // Indica se encontrou o registro.
-    boolean encontrado = false;
+                // Colocamos a lápide no registro.
+                // true significa que o registro está apagado.
+                registro.lapide = true;
 
-   // mesma coisa dos anteriores a checagem de tamanho 
-    while (arquivo.getFilePointer() < arquivo.length()) {
+                // Transformamos o registro novamente em bytes.
+                byte[] novosDados = registro.toByteArray();
 
-        int tamanho = arquivo.readInt();
+                // Voltamos para o início do registro.
+                arquivo.seek(posicao);
 
-        byte[] dados = new byte[tamanho];
+                // Gravamos novamente o tamanho.
+                arquivo.writeInt(novosDados.length);
 
-        arquivo.readFully(dados);
+                // Gravamos o registro com a lápide.
+                arquivo.write(novosDados);
 
-        tp1.Registro registro = new tp1.Registro(0, "","","","", "", 0,0,"");
+                // Indica que encontramos e apagamos o registro.
+                encontrado = true;
 
-        registro.fromByteArray(dados);
-       
-        if (registro.id == id) {
-
-            encontrado = true;
-
-        } else {
-
-            // se não for o registro que queremos excluir,
-            // copiamos normalmente para o arquivo temporário.
-            temporario.writeInt(tamanho);
-            temporario.write(dados);
+                // Como já encontramos o registro,
+                // podemos parar a procura.
+                break;
+            }
         }
+
+        arquivo.close();
+
+        return encontrado;
     }
-
-    arquivo.close();
-    temporario.close();
-
-    if (encontrado) {
-
-        // cria uma referência para o arquivo original.
-        java.io.File original =
-                new java.io.File("jogos.dat");
-
-        // cria uma referência para o temporário.
-        java.io.File temporarioFile =
-                new java.io.File("jogos_temp.dat");
-
-        // apaga o arquivo original.
-        original.delete();
-
-        // renomeia o temporário para jogos.dat.
-        temporarioFile.renameTo(original);
-
-    } else {
-
-        new java.io.File("jogos_temp.dat").delete();
-    }
-
-    return encontrado;
-}
 }
