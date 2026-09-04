@@ -4,25 +4,27 @@ import java.io.IOException;
 
 public class CRUD {
 
-    // Este método recebe um Registro e grava ele no arquivo jogos.dat, Atenção com o esse arquivo cabeção
-    // esse arquivo pode ser criado autmaticamente caso ele nao exista tipo o do kutsova sla
-
+    // Este método recebe um Registro e grava ele no arquivo jogos.dat.
+    // Atenção com esse arquivo cabeção.
+    // Esse arquivo pode ser criado automaticamente caso ele não exista.
     public static void CRIATE(Registro registro) throws IOException {
 
         // Abre o arquivo jogos.dat.
-        // o r e de red leitura se voce souber ingles, e o w e de leitura por isso botei ai
-        // se ele nao existir vai criar o arquivo
+        // O "r" é de leitura e o "w" é de escrita.
+        // Se ele não existir, o Java cria o arquivo.
         RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "rw");
 
-        // essa funcao de baixo leva ele pro final do arquivo sempre inserindo no final,
-        // assim evitando que a gente perca as informacoes
+        // Essa função leva ele para o final do arquivo,
+        // sempre inserindo no final, assim evitando que
+        // a gente perca as informações anteriores.
         arquivo.seek(arquivo.length());
 
         // Quando criamos um registro, ele começa como ativo.
         // false significa que o registro NÃO está apagado.
         registro.lapide = false;
 
-        // usei o metodo que voce criou no registo pra converter em byte
+        // Usei o método que você criou no Registro
+        // para converter o objeto em bytes.
         byte[] dados = registro.toByteArray();
 
         // Primeiro gravamos o tamanho do registro.
@@ -30,7 +32,7 @@ public class CRUD {
         // quantos bytes precisa ler para recuperar esse registro.
         arquivo.writeInt(dados.length);
 
-        // usando a funcao la, gravamos os dados no registro
+        // Usando a função lá, gravamos os dados do registro.
         arquivo.write(dados);
 
         // Fecha o arquivo.
@@ -38,50 +40,56 @@ public class CRUD {
     }
 
 
-    // cara o read ele busca por id, so pra deixar claro
+    // O READ busca um registro pelo ID.
     public static Registro READ(int id) throws IOException {
 
         RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "r");
 
-        // Enquanto ainda existirem registros no arquivo
-        // getFilePointer() = posição atual dentro do arquivo
-        // length() = tamanho total do arquivo
-        // acho que essas sao as principais pra voce entender oque eu fiz nesse caso
+        // Enquanto ainda existirem registros no arquivo.
+        // getFilePointer() = posição atual dentro do arquivo.
+        // length() = tamanho total do arquivo.
         while (arquivo.getFilePointer() < arquivo.length()) {
 
+            // Lê o tamanho do registro.
             int tamanho = arquivo.readInt();
 
-            // acaba que o tamanho do arquivo a gente cria o vetor
+            // Cria um vetor de bytes com o tamanho
+            // que foi armazenado no arquivo.
             byte[] dados = new byte[tamanho];
 
+            // Lê todos os bytes daquele registro.
             arquivo.readFully(dados);
 
             // Criei um Registro vazio temporariamente.
-            // a gente precisa de um objeto vazio pra colocar os dados do vetor la
-            Registro registro = new Registro(0, "", "", "", "", "", 0, 0, "");
+            // A gente precisa de um objeto vazio para
+            // colocar os dados do vetor nele.
+            Registro registro =
+                    new Registro(0, "", "", "", "", "", 0, 0, "");
 
-            // ai aqui a gente converte os bytes pra um novo tipo de registro
+            // Aqui a gente converte os bytes para um objeto Registro.
             registro.fromByteArray(dados);
 
-            // Verifiquei se o ID do registro é o ID e oque a gente procura
+            // Verifico se o ID do registro é o ID que estamos procurando.
             // Também verifico se o registro não está apagado pela lápide.
             if (registro.id == id && !registro.lapide) {
 
-                // se a gente encontrar e melhor fexar o arquivo antes de retornar
+                // Se encontrar, é melhor fechar o arquivo
+                // antes de retornar.
                 arquivo.close();
+
                 return registro;
             }
         }
 
-        // o arquivo nao tem o id que a gente queria
-        // ou o registro está marcado com lápide
+        // O arquivo não tem o ID que a gente queria
+        // ou o registro está marcado com lápide.
         arquivo.close();
 
         return null;
     }
 
 
-    // o update ele encontra o ID e substitui por um outro
+    // O UPDATE encontra o ID e atualiza os dados do registro.
     public static boolean UPDATE(int id, Registro novoRegistro)
             throws IOException {
 
@@ -91,21 +99,26 @@ public class CRUD {
         // Variável para saber se o registro foi encontrado.
         boolean encontrado = false;
 
-        // as coisas sao a mesma do Read
+        // Enquanto ainda existirem registros no arquivo.
         while (arquivo.getFilePointer() < arquivo.length()) {
 
             // Guarda a posição onde começa o tamanho do registro.
             long posicao = arquivo.getFilePointer();
 
+            // Lê o tamanho do registro atual.
             int tamanho = arquivo.readInt();
 
+            // Cria um vetor para armazenar os dados do registro.
             byte[] dados = new byte[tamanho];
 
+            // Lê os dados do registro.
             arquivo.readFully(dados);
 
+            // Cria um Registro vazio temporariamente.
             Registro registro =
                     new Registro(0, "", "", "", "", "", 0, 0, "");
 
+            // Converte os bytes para um objeto Registro.
             registro.fromByteArray(dados);
 
             // Verifica se encontramos o ID
@@ -118,19 +131,63 @@ public class CRUD {
                 // O novo registro também deve estar ativo.
                 novoRegistro.lapide = false;
 
+                // Converte o novo registro para bytes.
                 byte[] novosDados = novoRegistro.toByteArray();
 
-                // Voltamos para o começo do registro.
-                arquivo.seek(posicao);
+                if (novosDados.length == tamanho) {
 
-                // Grava o novo tamanho.
-                arquivo.writeInt(novosDados.length);
+                    // Voltamos para o começo do registro.
+                    arquivo.seek(posicao);
 
-                // Grava o novo registro.
-                arquivo.write(novosDados);
+                    // Grava o mesmo tamanho.
+                    arquivo.writeInt(novosDados.length);
 
-                // Indica que foi encontrado e atualiza.
-                encontrado = true;
+                    // Grava os novos dados no mesmo lugar.
+                    arquivo.write(novosDados);
+
+                    // Indica que foi encontrado e atualizado.
+                    encontrado = true;
+                }
+
+
+               
+                // CASO 2:
+                // O novo registro possui tamanho diferente.
+
+                else {
+
+                    // Primeiro precisamos marcar o registro antigo
+                    // com uma lápide.
+                    registro.lapide = true;
+
+                    // Converte o registro antigo para bytes novamente,
+                    // agora com a lápide marcada como true.
+                    byte[] registroApagado = registro.toByteArray();
+
+                    // Voltamos para o começo do registro antigo.
+                    arquivo.seek(posicao);
+
+                    // Mantemos o tamanho do registro antigo.
+                    arquivo.writeInt(registroApagado.length);
+
+                    // Gravamos o registro antigo com a lápide.
+                    arquivo.write(registroApagado);
+
+
+                    // Agora vamos para o final do arquivo.
+                    // O novo registro NÃO será colocado no lugar
+                    // do registro antigo porque seu tamanho é diferente.
+                    arquivo.seek(arquivo.length());
+
+                    // Gravamos o tamanho do novo registro.
+                    arquivo.writeInt(novosDados.length);
+
+                    // Gravamos o novo registro no final do arquivo.
+                    arquivo.write(novosDados);
+
+                    // Indica que foi encontrado e atualizado.
+                    encontrado = true;
+                }
 
                 // Como já encontramos o registro,
                 // podemos parar a procura.
@@ -138,6 +195,7 @@ public class CRUD {
             }
         }
 
+        // Fecha o arquivo.
         arquivo.close();
 
         return encontrado;
@@ -145,36 +203,44 @@ public class CRUD {
 
 
     // DELETE
-    // procura um registro pelo ID e remove ele do arquivo.
-    // agora usamos uma LÁPIDE, então o registro não é realmente removido.
-    // ele continua no arquivo, mas fica marcado como apagado.
+    // Procura um registro pelo ID e remove ele do arquivo.
+    // Agora usamos uma LÁPIDE, então o registro não é realmente removido.
+    // Ele continua no arquivo, mas fica marcado como apagado.
 
     public static boolean excluir(int id) throws IOException {
 
-        // Abre o arquivo no modo "rw", pois vamos ler e também modificar.
+        // Abre o arquivo no modo "rw",
+        // pois vamos ler e também modificar.
         RandomAccessFile arquivo =
                 new RandomAccessFile("jogos.dat", "rw");
 
         // Indica se encontrou o registro.
         boolean encontrado = false;
 
-        // mesma coisa dos anteriores a checagem de tamanho
+        // Enquanto ainda existirem registros no arquivo.
         while (arquivo.getFilePointer() < arquivo.length()) {
 
             // Guarda a posição onde começa o tamanho do registro.
             long posicao = arquivo.getFilePointer();
 
+            // Lê o tamanho do registro.
             int tamanho = arquivo.readInt();
 
+            // Cria um vetor para armazenar os dados.
             byte[] dados = new byte[tamanho];
 
+            // Lê todos os bytes do registro.
             arquivo.readFully(dados);
 
+            // Cria um Registro vazio temporariamente.
             Registro registro =
                     new Registro(0, "", "", "", "", "", 0, 0, "");
 
+            // Converte os bytes para um objeto Registro.
             registro.fromByteArray(dados);
 
+            // Verifica se encontramos o ID
+            // e se o registro ainda está ativo.
             if (registro.id == id && !registro.lapide) {
 
                 // Colocamos a lápide no registro.
@@ -202,8 +268,10 @@ public class CRUD {
             }
         }
 
+        // Fecha o arquivo.
         arquivo.close();
 
         return encontrado;
     }
 }
+
