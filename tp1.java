@@ -4,14 +4,323 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
-public class tp1 {
-  
+import java.io.RandomAccessFile;
+
+public class tp1Com {
+  public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+
+        String caminhoBin = "jogos.dat";
+
+        try {
+
+            int opcao = -1;
+
+            while (opcao != 0) {
+
+                System.out.println("\n========== MENU ==========");
+                System.out.println("1 - Carga da base de dados");
+                System.out.println("2 - Criar registro");
+                System.out.println("3 - Ler registro");
+                System.out.println("4 - Atualizar registro");
+                System.out.println("5 - Deletar registro");
+                System.out.println("6 - Ordenação externa");
+                System.out.println("0 - Sair");
+                System.out.println("==========================");
+
+                System.out.print("Escolha uma opção: ");
+                opcao = sc.nextInt();
+                sc.nextLine();
+
+
+                // Cargaa
+
+                if (opcao == 1) {
+
+                    String caminhoCsv = "C:\\Users\\Marina\\Documents\\Aeds III\\England 2 CSV-selected-columns.csv";
+
+                    CargaCsv.carregar(caminhoCsv, caminhoBin);
+
+                    System.out.println("Carga realizada com sucesso!");
+                }
+
+
+                //Create
+
+                else if (opcao == 2) {
+
+                    System.out.print("Time da casa: ");
+                    String homeTeam = sc.nextLine();
+
+                    System.out.print("Time visitante: ");
+                    String awayTeam = sc.nextLine();
+
+                    System.out.print("Arbitro: ");
+                    String referee = sc.nextLine();
+
+                    System.out.print("Data: ");
+                    String data = sc.nextLine();
+
+                    System.out.print("Gols da casa: ");
+                    int golsCasa = sc.nextInt();
+
+                    System.out.print("Gols fora: ");
+                    int golsFora = sc.nextInt();
+
+                    sc.nextLine();
+
+                    System.out.print("Resultado: ");
+                    String resultado = sc.nextLine();
+
+                    String listaTimes = homeTeam + "|" + awayTeam;
+
+                    Registro registro = new Registro(
+                        0,
+                        homeTeam,
+                        awayTeam,
+                        referee,
+                        data,
+                        listaTimes,
+                        golsCasa,
+                        golsFora,
+                        resultado
+                    );
+
+                    CRUD crud = new CRUD(caminhoBin);
+
+                    int id = crud.create(registro);
+
+                    crud.close();
+
+                    System.out.println("Registro criado!");
+                    System.out.println("ID: " + id);
+                }
+
+
+                // leia
+
+                else if (opcao == 3) {
+
+                    System.out.print("Digite o ID: ");
+                    int id = sc.nextInt();
+
+                    CRUD crud = new CRUD(caminhoBin);
+
+                    Registro registro = crud.read(id);
+
+                    crud.close();
+
+                    if (registro != null) {
+                        System.out.println(registro.ToString());
+                    }
+                    else {
+                        System.out.println("Registro não encontrado.");
+                    }
+                }
+
+
+                // Update
+
+                else if (opcao == 4) {
+
+                    System.out.print("Digite o ID: ");
+                    int id = sc.nextInt();
+
+                    sc.nextLine();
+
+                    System.out.print("Novo time da casa: ");
+                    String homeTeam = sc.nextLine();
+
+                    System.out.print("Novo time visitante: ");
+                    String awayTeam = sc.nextLine();
+
+                    System.out.print("Novo arbitro: ");
+                    String referee = sc.nextLine();
+
+                    System.out.print("Nova data: ");
+                    String data = sc.nextLine();
+
+                    System.out.print("Novos gols da casa: ");
+                    int golsCasa = sc.nextInt();
+
+                    System.out.print("Novos gols fora: ");
+                    int golsFora = sc.nextInt();
+
+                    sc.nextLine();
+
+                    System.out.print("Novo resultado: ");
+                    String resultado = sc.nextLine();
+
+                    String listaTimes = homeTeam + "|" + awayTeam;
+
+                    Registro novoRegistro = new Registro(
+                        id,
+                        homeTeam,
+                        awayTeam,
+                        referee,
+                        data,
+                        listaTimes,
+                        golsCasa,
+                        golsFora,
+                        resultado
+                    );
+
+                    CRUD crud = new CRUD(caminhoBin);
+
+                    boolean sucesso = crud.update(novoRegistro);
+
+                    crud.close();
+
+                    if (sucesso) {
+                        System.out.println("Registro atualizado!");
+                    }
+                    else {
+                        System.out.println("Registro não encontrado.");
+                    }
+                }
+
+
+                //Delete
+
+                else if (opcao == 5) {
+
+                    System.out.print("Digite o ID: ");
+                    int id = sc.nextInt();
+
+                    CRUD crud = new CRUD(caminhoBin);
+
+                    boolean sucesso = crud.delete(id);
+
+                    crud.close();
+
+                    if (sucesso) {
+                        System.out.println("Registro deletado!");
+                    }
+                    else {
+                        System.out.println("Registro não encontrado.");
+                    }
+                }
+
+
+                // Ordena
+
+                else if (opcao == 6) {
+
+                    System.out.print("Número de caminhos: ");
+                    int numCaminhos = sc.nextInt();
+
+                    System.out.print(
+                        "Máximo de registros em memória: "
+                    );
+
+                    int maxRegistros = sc.nextInt();
+
+                    if (numCaminhos > 0 && maxRegistros > 0) {
+
+                        OrdenTeste.ordenar(
+                            caminhoBin,
+                            numCaminhos,
+                            maxRegistros
+                        );
+
+                        System.out.println(
+                            "Ordenação realizada com sucesso!"
+                        );
+
+                    }
+                    else {
+
+                        System.out.println(
+                            "Os valores devem ser maiores que zero."
+                        );
+                    }
+                }
+
+
+                // Sair
+
+                else if (opcao == 0) {
+
+                    System.out.println("Programa encerrado.");
+                }
+
+
+                // OPÇÃO INVÁLIDA
+
+                else {
+
+                    System.out.println("Opção inválida!");
+                }
+            }
+
+        }
+        catch (IOException e) {
+
+            System.out.println(
+                "Erro ao acessar o arquivo: " + e.getMessage()
+            );
+        }
+
+        sc.close();
+  }// final do main
+}
+
+
+  class CargaCsv {
+  public static void carregar(String caminhoCsv, String caminhoBin)throws IOException{
+    BufferedReader b = new BufferedReader(new FileReader(caminhoCsv));
+    
+    RandomAccessFile arq3 = new RandomAccessFile(caminhoBin, "rw");
+
+    arq3.setLength(0);
+    arq3.writeInt(0);
+    b.readLine();
+    int id = 1;
+    String linha;
+
+    while((linha = b.readLine()) != null){
+      String[] campos = linha.split(",", -1);
+    
+      String data = campos[0];
+      String homeTeam = campos[1];
+      String awayTeam = campos[2];
+      
+      String referee = campos[6];
+
+      int golsCasa = Integer.parseInt(campos[3]);
+      int golsFora = Integer.parseInt(campos[4]);
+
+      String resultado = campos[5];
+
+      String listaTimes = homeTeam + "|" + awayTeam;
+
+      Registro r = new Registro( id, homeTeam, awayTeam, referee, data, listaTimes, golsCasa, golsFora, resultado);
+      
+      byte[] ba = r.toByteArray();
+      arq3.writeByte(0); // registro valido
+      arq3.writeInt(ba.length);
+      arq3.write(ba);
+
+      id++;
+    }
+
+    arq3.seek(0);
+    arq3.writeInt(id -1);
+
+    b.close();
+    arq3.close();
+
+  }
+}
 
 
 
 
-class Registro{
+ class Registro{
   int id;
   
   //campo Fixo
@@ -99,287 +408,525 @@ class Registro{
   }
 
 
-}//Registro
-
-  
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 
 
 
+}
 
-Class CargaCsv {
-  public static void carregar(String caminhoCsv, String caminhoBin)throws IOException{
-    BufferedReader b = new BufferedReader(new FileReader(caminhoCsv));
+
+class OrdenTeste {
+  static final int Tam_BLOCO = 10;
+
+  public static void ordenarBloco(Registro[] bloco, int qtd){
+    for(int i = 1; i < qtd; i++){
+      Registro aux = bloco[i];
+      int j = i -1;
+
+      while(j >= 0 && bloco[j].id > aux.id){
+        bloco[j + 1] = bloco[j];
+        j--;
+
+      }
+      bloco[j + 1] = aux;
+    }
+  }
+
+  static void gravarRegistro(RandomAccessFile arq , Registro r )throws IOException{
+    byte[] dados = r.toByteArray();
     
-    RandomAccessFile arq3 = new RandomAccessFile(caminhoBin, "rw");
+    arq.writeByte(0); //aqui não é boolean arrumar, 0 = valido, 1 = excluido
+    arq.writeInt(dados.length);
+    arq.write(dados);
+  }
 
+  public static Registro lerRegistro( RandomAccessFile arq) throws IOException{
+    if(arq.getFilePointer() >= arq.length()){
+      return null;
+    }
+    byte lapide = arq.readByte();
+    int tamanho = arq.readInt();
+    byte[] dados = new byte[tamanho];
+    arq.readFully(dados);
+    Registro r = new Registro( 0, "", "", "", "", "", 0, 0, "");
+    r.fromByteArray(dados);
 
-    arq3.writeInt(0);
-    b.readLine();
-    int id = 1;
-    String linha;
+    if(lapide == 1){
+      return null;
+    }
+    return r;
+  }
 
-    while((linha = b.readLine()) != null){
-      String[] campos = linha.split(",");
-      String data = campos[0];
-      String homeTeam = campos[1];
-      String awayTeam = campos[2];
-      String referee = campos[3];
+  public static int criarBloxs(String caminho, int maxRegistros) throws IOException{
+    RandomAccessFile entrada = new RandomAccessFile(caminho,"r");
+    entrada.seek(4);
+    Registro[] bloco = new Registro[maxRegistros];
+    int quantidadeBlocos = 0;
+    while( entrada.getFilePointer() < entrada.length()){
+      int qte = 0;
+      while(qte < maxRegistros && entrada.getFilePointer() < entrada.length()){
+        Registro r = lerRegistro(entrada);
+        if(r!= null){
+          bloco[qte] = r;
+          qte++;
 
-      int golsCasa = Integer.parseInt(campos[4]);
-      int golsFora = Integer.parseInt(campos[5]);
+        }
+      }
+      if(qte > 0){
+        ordenarBloco(bloco, qte);
+        String nome = "bloco" + quantidadeBlocos + ".tmp";
 
-      String resultado = campos[6];
+        RandomAccessFile temp = new RandomAccessFile(nome, "rw");
+        temp.setLength(0);
+        for (int i = 0; i < qte; i++) {
+          gravarRegistro(temp, bloco[i]);
+          
+        }
+        temp.close();
+        quantidadeBlocos++;
+      }
+    }
+    entrada.close();
+    return quantidadeBlocos;
+  }
+  public static void intercalacao(String[] nomes, String arqSaida) throws IOException {
 
-      String listaTimes = homeTeam + "|" + awayTeam;
+    RandomAccessFile[] arquivos = new RandomAccessFile[nomes.length];
+    Registro[] registros = new Registro[nomes.length];
 
-      tp1.Registro r = new tp1.Registro( id, homeTeam, awayTeam, referee, data, listaTimes, golsCasa, golsFora, resultado);
-      
-      byte[] ba = r.toByteArray();
-      arq3.writeByte(1);
-      arq3.writeInt(ba.length);
-      arq3.write(ba);
-
-      id++;
+    for(int i = 0; i < nomes.length; i++) {
+        arquivos[i] = new RandomAccessFile(nomes[i], "r");
+        registros[i] = lerRegistro(arquivos[i]);
     }
 
-    arq3.seek(0);
-    arq3.writeInt(id -1);
+    RandomAccessFile arquivoSaida =
+        new RandomAccessFile(arqSaida, "rw");
 
-    b.close();
-    arq3.close();
+    arquivoSaida.setLength(0);
 
+    while(true) {
+
+        int menor = -1;
+
+        for(int i = 0; i < nomes.length; i++) {
+
+            if(registros[i] != null) {
+
+                if(menor == -1 || registros[i].id < registros[menor].id) {
+                    menor = i;
+                }
+            }
+        }
+
+        if(menor == -1) {
+            break;
+        }
+
+        gravarRegistro(arquivoSaida, registros[menor]);
+
+        registros[menor] = lerRegistro(arquivos[menor]);
+    }
+
+    arquivoSaida.close();
+
+    for(int i = 0; i < nomes.length; i++) {
+        arquivos[i].close();
+    }
   }
-}//Carga do Csv
+
+  public static void ordenar(String caminho, int numCaminhos, int maxRegistros) throws IOException {
+
+    int qteBlocos = criarBloxs(caminho, maxRegistros);
+    int rodada = 0;
+
+    while(qteBlocos > 1) {
+
+        int novosBlocos = 0;
+
+        for(int i = 0; i < qteBlocos; i += numCaminhos) {
+
+            int qteArquivos = Math.min(numCaminhos, qteBlocos - i);
+
+            String[] nomes = new String[qteArquivos];
+
+            for(int j = 0; j < qteArquivos; j++) {
+
+                if(rodada == 0) {
+                    nomes[j] = "bloco" + (i + j) + ".tmp";
+                } else {
+                    nomes[j] = "intercalado" + (rodada - 1)
+                             + "_" + (i + j) + ".tmp";
+                }
+            }
+
+            String saida = "intercalado" + rodada + "_" + novosBlocos + ".tmp";
+
+            intercalacao(nomes, saida);
+
+            novosBlocos++;
+        }
+
+        qteBlocos = novosBlocos;
+        rodada++;
+    }
+
+    String arquivoFinal;
+
+    if(rodada == 0) {
+        arquivoFinal = "bloco0.tmp";
+    } else {
+        arquivoFinal = "intercalado" + (rodada - 1) + "_0.tmp";
+    }
+
+    copiarFile(arquivoFinal, caminho);
+  }
+  public static void copiarFile(String origem, String destino) throws IOException{
+
+    RandomAccessFile arquivoOri = new RandomAccessFile(origem, "r");
+    RandomAccessFile arquivoDes = new RandomAccessFile(destino, "rw");
+
+    arquivoDes.seek(0);
+    int ultimoId = arquivoDes.readInt();
+    arquivoDes.setLength(0);
+
+    
 
 
 
-import java.io.RandomAccessFile;
-import java.io.IOException;
+    arquivoDes.writeInt(ultimoId);
 
-class CRUD {
-    // Este método recebe um Registro e grava ele no arquivo jogos.dat, Atenção com o esse arquivo cabeção
-    // esse arquivo pode ser criado autmaticamente caso ele nao exista tipo o do kutsova sla
+    while(arquivoOri.getFilePointer() < arquivoOri.length()){
 
-    public static void CREATE(Registro registro) throws IOException {
+        Registro r = lerRegistro(arquivoOri);
 
-        // Abre o arquivo jogos.dat.
-       // o r e de red leitura se voce souber ingles, e o w e de leitura por isso botei ai
-        // se ele nao existir vai criar o arquivo
-        RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "rw");
+        if(r != null){
+            gravarRegistro(arquivoDes, r);
+        }
+    }
 
-       // essa funcao de baixo leva ele pro final do arquivo sempre inserindo no final, assim evitando que a gente perca as informacoes
+    arquivoOri.close();
+    arquivoDes.close();
+  }
+  
+
+
+}
+
+
+
+
+
+
+
+
+
+ class CRUD {
+
+    private RandomAccessFile arquivo;
+
+    // Abre o arquivo
+    public CRUD(String nomeArquivo) throws IOException {
+        arquivo = new RandomAccessFile(nomeArquivo, "rw");
+
+        // Se o arquivo estiver vazio, cria o cabeçalho
+        if (arquivo.length() == 0) {
+            arquivo.writeInt(0);
+        }
+    }
+
+    // =========================================================
+    // CREATE
+    // =========================================================
+    public int create(Registro registro) throws IOException {
+
+        // Vai para o começo do arquivo
+        arquivo.seek(0);
+
+        // Lê o último ID usado
+        int ultimoId = arquivo.readInt();
+
+        // Gera o próximo ID
+        int novoId = ultimoId + 1;
+
+        registro.id = novoId;
+
+        // Atualiza o último ID usado no cabeçalho
+        arquivo.seek(0);
+        arquivo.writeInt(novoId);
+
+        // Vai para o final do arquivo
         arquivo.seek(arquivo.length());
 
-        // usei o metodo que voce criou no registo pra converter em byte
+        // Transforma o registro em bytes
         byte[] dados = registro.toByteArray();
 
-        // Primeiro gravamos o tamanho do registro.
-        // Isso permite que posteriormente o programa saiba
-        // quantos bytes precisa ler para recuperar esse registro.
+        // Lápide
+        // false = registro válido
+        // true  = registro excluído
+        arquivo.writeByte(0);
+
+        // Tamanho do registro
         arquivo.writeInt(dados.length);
 
-        // usando a funcao la, gravamos os dados no registro
+        // Dados
         arquivo.write(dados);
 
-        // Fecha o arquivo.
-        arquivo.close();
+        return novoId;
     }
 
 
-    // cara o read ele busca por id, so pra deixar claro
-    public static Registro READ(int id) throws IOException {
+    // =========================================================
+    // READ
+    // =========================================================
+    public Registro read(int id) throws IOException {
+
+        // Começa depois do cabeçalho
+        arquivo.seek(4);
+
+        while (arquivo.getFilePointer() < arquivo.length()) {
+
+            // Guarda a posição onde começa a lápide
+            long posicao = arquivo.getFilePointer();
+
+            // Lê a lápide
+            byte lapide = arquivo.readByte();
+
+            // Lê o tamanho dos dados
+            int tamanho = arquivo.readInt();
+
+            // Lê os dados
+            byte[] dados = new byte[tamanho];
+            arquivo.readFully(dados);
+
+            // Se não estiver excluído
+            if (lapide == 0) {
+
+                Registro registro = new Registro(
+                    0,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    0,
+                    0,
+                    ""
+                );
+
+                registro.fromByteArray(dados);
+
+                // Verifica o ID
+                if (registro.id == id) {
+                    return registro;
+                }
+            }
+        }
+
+        // Não encontrou
+        return null;
+    }
+
+
+    // =========================================================
+    // READ ALL
+    // =========================================================
+    public Registro[] readAll() throws IOException {
+
+        // Quantidade máxima possível
+        Registro[] registros = new Registro[1000];
+
+        int qtd = 0;
+
+        arquivo.seek(4);
+
+        while (arquivo.getFilePointer() < arquivo.length()) {
+
+            byte lapide = arquivo.readByte();
+
+            int tamanho = arquivo.readInt();
+
+            byte[] dados = new byte[tamanho];
+            arquivo.readFully(dados);
+
+            if (lapide == 0) {
+
+                Registro registro = new Registro(
+                    0,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    0,
+                    0,
+                    ""
+                );
+
+                registro.fromByteArray(dados);
+
+                registros[qtd] = registro;
+                qtd++;
+            }
+        }
+
+        Registro[] resposta = new Registro[qtd];
+
+        for (int i = 0; i < qtd; i++) {
+            resposta[i] = registros[i];
+        }
+
+        return resposta;
+    }
+
+
+  
+    public boolean update(Registro novoRegistro) throws IOException {
+
+        arquivo.seek(4);
+
+        while (arquivo.getFilePointer() < arquivo.length()) {
+
+            // Guarda a posição da lápide
+            long posicaoLapide = arquivo.getFilePointer();
+
+            byte lapide = arquivo.readByte();
+
+            int tamanho = arquivo.readInt();
+
+            // Guarda a posição onde começam os dados
+            long posicaoDados = arquivo.getFilePointer();
+
+            byte[] dados = new byte[tamanho];
+            arquivo.readFully(dados);
+
+            // Só procura entre registros válidos
+            if (lapide == 0) {
+
+                Registro registroAtual = new Registro(
+                    0,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    0,
+                    0,
+                    ""
+                );
+
+                registroAtual.fromByteArray(dados);
+
+                // Encontrou o registro
+                if (registroAtual.id == novoRegistro.id) {
+
+                    byte[] novosDados = novoRegistro.toByteArray();
+
+                   
+                    if (novosDados.length == tamanho) {
+
+                        arquivo.seek(posicaoDados);
+                        arquivo.write(novosDados);
+
+                        return true;
+                    }
+
+                   
+                    else if (novosDados.length < tamanho) {
+
+                      arquivo.seek(posicaoLapide);
+                      arquivo.writeByte(1);
+                      arquivo.seek(arquivo.length());
+
+
+                      arquivo.writeByte(0);
+                      arquivo.writeInt(novosDados.length);
+                      arquivo.write(novosDados);
+
+
+                        return true;
+                    }
+
+                    
+                    else {
+
+                        // Marca o registro antigo como excluído
+                        arquivo.seek(posicaoLapide);
+                        arquivo.writeByte(1);
+
+                        // Vai para o final
+                        arquivo.seek(arquivo.length());
+
+                        // Escreve o novo registro
+                        arquivo.writeByte(0);
+                        arquivo.writeInt(novosDados.length);
+                        arquivo.write(novosDados);
+
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    public boolean delete(int id) throws IOException {
+
+        arquivo.seek(4);
+
+        while (arquivo.getFilePointer() < arquivo.length()) {
+
+            // Guarda a posição da lápide
+            long posicaoLapide = arquivo.getFilePointer();
+
+            byte lapide = arquivo.readByte();
+
+            int tamanho = arquivo.readInt();
+
+            byte[] dados = new byte[tamanho];
+            arquivo.readFully(dados);
+
+            // Só verifica registros válidos
+            if (lapide == 0) {
+
+                Registro registro = new Registro(
+                    0,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    0,
+                    0,
+                    ""
+                );
+
+                registro.fromByteArray(dados);
+
+                if (registro.id == id) {
+
+                    // Exclusão lógica
+                    arquivo.seek(posicaoLapide);
+                    arquivo.writeByte(1);
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
 
    
-    RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "r");
-
-    // Enquanto ainda existirem registros no arquivo
-    // getFilePointer() = posição atual dentro do arquivo
-    // length() = tamanho total do arquivo
-    // acho que essas sao as principais pra voce entender oque eu fiz nesse caso 
-    while (arquivo.getFilePointer() < arquivo.length()) {
-
-        int tamanho = arquivo.readInt();
-       // acaba que o tamanho do arquivo a gente cria o vetor 
-        byte[] dados = new byte[tamanho];
-
-         arquivo.readFully(dados);
-
-        // Criei um Registro vazio temporariamente.
-        // a gente precisa de um objeto vazio pra colocar os dados do vetor la
-        
-        Registro registro = new Registro(0,"","","","","",0,0,"");
-
-       // ai aqui a gente converte os bytes pra um novo tipo de registro 
-        registro.fromByteArray(dados);
-
-        // Verifiquei se o ID do registro é o ID e oque a gente procura 
-        
-        if (registro.id == id) {
-
-           // se a gente encontrar e melhor fexar o arquivo antes de retornar 
-            arquivo.close();
-            return registro;
-        }
+    public void close() throws IOException {
+        arquivo.close();
     }
-
-    // o arquivo nao tem o id que a gente queria
-    arquivo.close();
-
-    return null;
-}
-// o update ele encontra o ID e substitui por um outro
-public static boolean UPDATE(int id, tp1.Registro novoRegistro)
-        throws IOException {
-
-     RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "r");
-
-     RandomAccessFile temporario = new RandomAccessFile("jogos_temp.dat", "rw");
-
-    // Variável para saber se o registro foi encontrado.
-    boolean encontrado = false;
-
-   // as coisas sao a mesma do Read
-    while (arquivo.getFilePointer() < arquivo.length()) {
-        int tamanho = arquivo.readInt();
-
-        byte[] dados = new byte[tamanho];
-
-        arquivo.readFully(dados);
-
-        Registro registro = new Registro(0,"","","","","",0,0,"");
-
-        registro.fromByteArray(dados);
-
-        if (registro.id == id) {
-
-            byte[] novosDados = novoRegistro.toByteArray();
-
-            temporario.writeInt(novosDados.length);
-
-            // Grava o novo registro.
-            temporario.write(novosDados);
-
-            // Indica que foi encontrado e atualiza.
-            encontrado = true;
-
-        } else {
-           // esse else e pra se caso nao encontrarmos o registro que queremos atualizar a gente mantem o original 
-            temporario.writeInt(tamanho);
-            temporario.write(dados);
-        }
-    }
-
-    arquivo.close();
-    temporario.close();
-
-    // Se encontrou o registro
-    if (encontrado) {
-
-        // Cria o objetos File para poder manipular
-        // os arquivos no sistema.
-        java.io.File original =new java.io.File("jogos.dat");
-
-        java.io.File temporarioFile = new java.io.File("jogos_temp.dat");
-
-        // Apaga o arquivo original.
-        original.delete();
-
-        // Renomeia o arquivo temporário para jogos.dat.
-        temporarioFile.renameTo(original);
-    } else {
-
-        // Se não encontrou o ID, apaga o arquivo temporário porque não precisa dele
-       
-        new java.io.File("jogos_temp.dat").delete();
-    }
-    return encontrado;
 }
 
-// DELETE
-// procura um registro pelo ID e remove ele do arquivo.
-// usei arquivo temporario pra ficar melhor(nao sei se pode ou nao usar arquivo temporario)
-
-public static boolean DELETE(int id) throws IOException {
-
-
-    RandomAccessFile arquivo =new RandomAccessFile("jogos.dat", "r");
-
-
-    RandomAccessFile temporario = new RandomAccessFile("jogos_temp.dat", "rw");
-
-    // Indica se encontrou o registro.
-    boolean encontrado = false;
-
-   // mesma coisa dos anteriores a checagem de tamanho 
-    while (arquivo.getFilePointer() < arquivo.length()) {
-
-        int tamanho = arquivo.readInt();
-
-        byte[] dados = new byte[tamanho];
-
-        arquivo.readFully(dados);
-
-        tp1.Registro registro = new tp1.Registro(0, "","","","", "", 0,0,"");
-
-        registro.fromByteArray(dados);
-       
-        if (registro.id == id) {
-
-            encontrado = true;
-
-        } else {
-
-            // se não for o registro que queremos excluir,
-            // copiamos normalmente para o arquivo temporário.
-            temporario.writeInt(tamanho);
-            temporario.write(dados);
-        }
-    }
-
-    arquivo.close();
-    temporario.close();
-
-    if (encontrado) {
-
-        // cria uma referência para o arquivo original.
-        java.io.File original =
-                new java.io.File("jogos.dat");
-
-        // cria uma referência para o temporário.
-        java.io.File temporarioFile =
-                new java.io.File("jogos_temp.dat");
-
-        // apaga o arquivo original.
-        original.delete();
-
-        // renomeia o temporário para jogos.dat.
-        temporarioFile.renameTo(original);
-
-    } else {
-
-        new java.io.File("jogos_temp.dat").delete();
-    }
-
-    return encontrado;
-}
-  
-}// Crud
-
-}//tp1
 
 
 
 
 
 
-
-
-
-
-
-}
