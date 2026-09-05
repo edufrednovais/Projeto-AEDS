@@ -1,5 +1,8 @@
 class OrdenTeste {
-  static final int Tam_BLOCO = 10;
+  static final int Tam_BLOCO = 10; // provavelmnete não vou usar
+ 
+  //Aqui eu usei o insertion Sort, para ordenar os blocos em memoria pelo id
+ 
 
   public static void ordenarBloco(Registro[] bloco, int qtd){
     for(int i = 1; i < qtd; i++){
@@ -15,6 +18,7 @@ class OrdenTeste {
     }
   }
 
+  // Bem nesse metodo vamos converter o registro para bytes e gravar a lapide junto com o tamanho do registro
   static void gravarRegistro(RandomAccessFile arq , Registro r )throws IOException{
     byte[] dados = r.toByteArray();
     
@@ -23,6 +27,7 @@ class OrdenTeste {
     arq.write(dados);
   }
 
+  // Aqui vamos inverter o oq aconetceu no anterior, vamos  ler o registro  do arquivo em bytes bytes converter ele de volta para obejto, ignorando os deletes 
   public static Registro lerRegistro( RandomAccessFile arq) throws IOException{
     if(arq.getFilePointer() >= arq.length()){
       return null;
@@ -40,6 +45,7 @@ class OrdenTeste {
     return r;
   }
 
+  // divide o aqruivo em blocos menores, ordenando em blocos em menmoria e salva em um arquivo temp.
   public static int criarBloxs(String caminho, int maxRegistros) throws IOException{
     RandomAccessFile entrada = new RandomAccessFile(caminho,"r");
     entrada.seek(4);
@@ -72,6 +78,8 @@ class OrdenTeste {
     entrada.close();
     return quantidadeBlocos;
   }
+
+  // esse foi dificil em, juntas o blcoos ordenados, sempre pelo menor id, e cria o arquivo ordenado
   public static void intercalacao(String[] nomes, String arqSaida) throws IOException {
 
     RandomAccessFile[] arquivos = new RandomAccessFile[nomes.length];
@@ -116,7 +124,7 @@ class OrdenTeste {
         arquivos[i].close();
     }
   }
-
+// essa aqui toma conta da ordenação externa  e fica de olho nas rodadas da intercalao e chama o copiarFile
   public static void ordenar(String caminho, int numCaminhos, int maxRegistros) throws IOException {
 
     int qteBlocos = criarBloxs(caminho, maxRegistros);
@@ -163,6 +171,8 @@ class OrdenTeste {
 
     copiarFile(arquivoFinal, caminho);
   }
+
+  // FInalmente o Ultimo, ta acabando, copia o ultimo arquivo ordenado de volta para o aqruivo principal mantendo o id
   public static void copiarFile(String origem, String destino) throws IOException{
 
     RandomAccessFile arquivoOri = new RandomAccessFile(origem, "r");
