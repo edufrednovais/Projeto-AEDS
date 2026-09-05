@@ -31,6 +31,7 @@ public class CargaCsv {
       String resultado = campos[6];
 
       String listaTimes = homeTeam + "|" + awayTeam;
+      // Arsenal | Chealse
 
       tp1.Registro r = new tp1.Registro( id, homeTeam, awayTeam, referee, data, listaTimes, golsCasa, golsFora, resultado);
       
