@@ -282,8 +282,9 @@ public class tp1Com {
     int id = 1;
     String linha;
 
+    // tirar a , do csv 
     while((linha = b.readLine()) != null){
-      String[] campos = linha.split(",", -1);
+      String[] campos = linha.split(",", -1); // o -1 é pq no csv tem registro que não tem o arbitro então ele so vai ate o 6, porem o index do campo vai ate 7 então coloquei -1 para ignorar esses casos de 6 campos 
     
       String data = campos[0];
       String homeTeam = campos[1];
@@ -415,8 +416,9 @@ public class tp1Com {
 
 
 class OrdenTeste {
-  static final int Tam_BLOCO = 10;
-
+  static final int Tam_BLOCO = 10; // provavelmnete não vou usar
+  
+  //Aqui eu usei o insertion Sort, para ordenar os blocos em memoria pelo id
   public static void ordenarBloco(Registro[] bloco, int qtd){
     for(int i = 1; i < qtd; i++){
       Registro aux = bloco[i];
@@ -431,6 +433,7 @@ class OrdenTeste {
     }
   }
 
+   // Bem nesse metodo vamos converter o registro para bytes e gravar a lapide junto com o tamanho do registro
   static void gravarRegistro(RandomAccessFile arq , Registro r )throws IOException{
     byte[] dados = r.toByteArray();
     
@@ -439,6 +442,7 @@ class OrdenTeste {
     arq.write(dados);
   }
 
+   // Aqui vamos inverter o oq aconetceu no anterior, vamos  ler o registro  do arquivo em bytes bytes converter ele de volta para obejto, ignorando os deletes 
   public static Registro lerRegistro( RandomAccessFile arq) throws IOException{
     if(arq.getFilePointer() >= arq.length()){
       return null;
@@ -456,6 +460,7 @@ class OrdenTeste {
     return r;
   }
 
+   // divide o aqruivo em blocos menores, ordenando em blocos em menmoria e salva em um arquivo temp.
   public static int criarBloxs(String caminho, int maxRegistros) throws IOException{
     RandomAccessFile entrada = new RandomAccessFile(caminho,"r");
     entrada.seek(4);
@@ -488,6 +493,8 @@ class OrdenTeste {
     entrada.close();
     return quantidadeBlocos;
   }
+
+   // esse foi dificil em, juntas o blcoos ordenados, sempre pelo menor id, e cria o arquivo ordenado
   public static void intercalacao(String[] nomes, String arqSaida) throws IOException {
 
     RandomAccessFile[] arquivos = new RandomAccessFile[nomes.length];
@@ -533,6 +540,7 @@ class OrdenTeste {
     }
   }
 
+  // essa aqui toma conta da ordenação externa  e fica de olho nas rodadas da intercalao e chama o copiarFile
   public static void ordenar(String caminho, int numCaminhos, int maxRegistros) throws IOException {
 
     int qteBlocos = criarBloxs(caminho, maxRegistros);
@@ -579,6 +587,8 @@ class OrdenTeste {
 
     copiarFile(arquivoFinal, caminho);
   }
+
+  // FInalmente o Ultimo, ta acabando, copia o ultimo arquivo ordenado de volta para o aqruivo principal mantendo o id
   public static void copiarFile(String origem, String destino) throws IOException{
 
     RandomAccessFile arquivoOri = new RandomAccessFile(origem, "r");
@@ -627,29 +637,27 @@ class OrdenTeste {
     public CRUD(String nomeArquivo) throws IOException {
         arquivo = new RandomAccessFile(nomeArquivo, "rw");
 
-        // Se o arquivo estiver vazio, cria o cabeçalho
+        // Se o arquivo estiver vazio cria o cabeçalho
         if (arquivo.length() == 0) {
             arquivo.writeInt(0);
         }
     }
 
-    // =========================================================
-    // CREATE
-    // =========================================================
+   
     public int create(Registro registro) throws IOException {
 
         // Vai para o começo do arquivo
         arquivo.seek(0);
 
-        // Lê o último ID usado
+        
         int ultimoId = arquivo.readInt();
 
-        // Gera o próximo ID
+     
         int novoId = ultimoId + 1;
 
         registro.id = novoId;
 
-        // Atualiza o último ID usado no cabeçalho
+        
         arquivo.seek(0);
         arquivo.writeInt(novoId);
 
@@ -659,24 +667,19 @@ class OrdenTeste {
         // Transforma o registro em bytes
         byte[] dados = registro.toByteArray();
 
-        // Lápide
-        // false = registro válido
-        // true  = registro excluído
+        // Lapide  false = registro válido  true  = registro excluído
         arquivo.writeByte(0);
 
-        // Tamanho do registro
         arquivo.writeInt(dados.length);
 
-        // Dados
+       
         arquivo.write(dados);
 
         return novoId;
     }
 
 
-    // =========================================================
-    // READ
-    // =========================================================
+ 
     public Registro read(int id) throws IOException {
 
         // Começa depois do cabeçalho
@@ -684,20 +687,18 @@ class OrdenTeste {
 
         while (arquivo.getFilePointer() < arquivo.length()) {
 
-            // Guarda a posição onde começa a lápide
+       
             long posicao = arquivo.getFilePointer();
 
-            // Lê a lápide
             byte lapide = arquivo.readByte();
 
-            // Lê o tamanho dos dados
             int tamanho = arquivo.readInt();
 
-            // Lê os dados
+        
             byte[] dados = new byte[tamanho];
             arquivo.readFully(dados);
 
-            // Se não estiver excluído
+          
             if (lapide == 0) {
 
                 Registro registro = new Registro(
@@ -726,9 +727,7 @@ class OrdenTeste {
     }
 
 
-    // =========================================================
-    // READ ALL
-    // =========================================================
+
     public Registro[] readAll() throws IOException {
 
         // Quantidade máxima possível
@@ -785,20 +784,20 @@ class OrdenTeste {
 
         while (arquivo.getFilePointer() < arquivo.length()) {
 
-            // Guarda a posição da lápide
+
             long posicaoLapide = arquivo.getFilePointer();
 
             byte lapide = arquivo.readByte();
 
             int tamanho = arquivo.readInt();
 
-            // Guarda a posição onde começam os dados
+
             long posicaoDados = arquivo.getFilePointer();
 
             byte[] dados = new byte[tamanho];
             arquivo.readFully(dados);
 
-            // Só procura entre registros válidos
+
             if (lapide == 0) {
 
                 Registro registroAtual = new Registro(
@@ -848,14 +847,13 @@ class OrdenTeste {
                     
                     else {
 
-                        // Marca o registro antigo como excluído
+                    
                         arquivo.seek(posicaoLapide);
                         arquivo.writeByte(1);
 
-                        // Vai para o final
                         arquivo.seek(arquivo.length());
 
-                        // Escreve o novo registro
+                    
                         arquivo.writeByte(0);
                         arquivo.writeInt(novosDados.length);
                         arquivo.write(novosDados);
@@ -876,7 +874,7 @@ class OrdenTeste {
 
         while (arquivo.getFilePointer() < arquivo.length()) {
 
-            // Guarda a posição da lápide
+      
             long posicaoLapide = arquivo.getFilePointer();
 
             byte lapide = arquivo.readByte();
@@ -886,7 +884,6 @@ class OrdenTeste {
             byte[] dados = new byte[tamanho];
             arquivo.readFully(dados);
 
-            // Só verifica registros válidos
             if (lapide == 0) {
 
                 Registro registro = new Registro(
@@ -905,7 +902,7 @@ class OrdenTeste {
 
                 if (registro.id == id) {
 
-                    // Exclusão lógica
+                
                     arquivo.seek(posicaoLapide);
                     arquivo.writeByte(1);
 
