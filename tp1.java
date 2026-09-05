@@ -249,7 +249,7 @@ public class tp1Com {
                 }
 
 
-                // OPÇÃO INVÁLIDA
+                // nao tem essa opcao
 
                 else {
 
