@@ -1,8 +1,12 @@
-
+```java
 import java.io.RandomAccessFile;
 import java.io.IOException;
 
 public class CRUD {
+    // A arvore B passa a ser o nosso indice.
+    // Ela guarda:
+    // ID -> posicao do registro no jogos.dat
+    private static ArvoreB arvore = new ArvoreB();
 
     public static void CRIATE(Registro registro) throws IOException {
 
@@ -30,27 +34,13 @@ public class CRUD {
         // Fecha o arquivo principal.
         arquivo.close();
 
-
         // Arthurrrrr aqui comeca as alteracoes.
         // Aqui atualiza o indice
 
-        RandomAccessFile indice = new RandomAccessFile("indice.dat", "rw");
-
-        // Vai para o final do indice.
-        indice.seek(indice.length());
-
-        // Grava o ID.
-        indice.writeInt(registro.id);
-
-        // Grava a posicao do registro no jogos.dat.
-        indice.writeLong(posicao);
-
-        // Fecha o indice.
-        indice.close();
+        // Insere no indice da arvore B:
+        // ID -> posicao no jogos.dat
+        arvore.inserir(registro.id, posicao);
     }
-
-
-
 
     // Buscar a posicao do indice.
     // Recebe um ID e retorna a posição dele no jogos.dat.
@@ -58,35 +48,9 @@ public class CRUD {
     // Codicao base irmao
     private static long buscarIndice(int id) throws IOException {
 
-        RandomAccessFile indice = new RandomAccessFile("indice.dat", "r");
-
-        // Cada registro do índice possui:
-        // int  = 4 bytes
-        // long = 8 bytes
-        // Total = 12 bytes, isso ai tem que ter uma atencao maior, essa alteracao eu nao achei nos viceos do kutova, ai vi no youtube
-        while (indice.getFilePointer() < indice.length()) {
-
-            // Le o ID do indice.
-            int idIndice = indice.readInt();
-
-            // Le a posicao no jogos.dat.
-            long posicao = indice.readLong();
-
-            // Verifica se encontrou o ID.
-            if (idIndice == id) {
-
-                indice.close();
-
-                return posicao;
-            }
-        }
-
-        indice.close();
-
-        return -1;
+        // Procura diretamente na arvore B.
+        return arvore.buscar(id);
     }
-
-
     // READ
     // Busca um registro utilizando o indice.
     // Diferente do CRUD sequencial, nao percorremos todos, essa alteracao muda muito pra quando a gente trabalhar com arvore
@@ -136,10 +100,7 @@ public class CRUD {
 
         return registro;
     }
-
-
     // UPDATE
-
     public static boolean UPDATE(int id, Registro novoRegistro)
             throws IOException {
 
@@ -231,7 +192,6 @@ public class CRUD {
             // Grava o registro com lapide.
             arquivo.write(registroApagado);
 
-
             // NOVO REGISTRO
 
             // Vai para o final do arquivo.
@@ -249,7 +209,6 @@ public class CRUD {
             // Fecha o arquivo.
             arquivo.close();
 
-
             // ATUALIZA O ÍNDICE
 
             atualizarIndice(id, novaPosicao);
@@ -258,46 +217,15 @@ public class CRUD {
         }
     }
 
-
     // ATUALIZAR ÍNDICE
     // Usado quando o UPDATE precisa colocar o registro
     // no final do arquivo.
-    private static void atualizarIndice(int id,long novaPosicao) throws IOException {
-
-        RandomAccessFile indice = new RandomAccessFile("indice.dat", "rw");
-
-        // Procura o ID dentro do indice.
-        while (indice.getFilePointer() < indice.length()) {
-
-            // Guarda a posição da entrada do índice.
-            long posicaoIndice =
-                    indice.getFilePointer();
-
-            // Lê o ID.
-            int idIndice =
-                    indice.readInt();
-
-            // Lê a posicao antiga.
-            indice.readLong();
-
-            // Encontrou o ID.
-            if (idIndice == id) {
-
-                // Volta para a posicao onde fica o long.
-                indice.seek(posicaoIndice + 4);
-
-                // Atualiza a posicao.
-                indice.writeLong(novaPosicao);
-
-                indice.close();
-
-                return;
-            }
-        }
-
-        indice.close();
+    private static void atualizarIndice(int id, long novaPosicao) throws IOException {
+        // Procura o ID dentro da arvore B.
+        // Como a arvore ja possui o ID,
+        // apenas atualizamos a posicao.
+        arvore.atualizar(id, novaPosicao);
     }
-
 
     // DELETE
     // Marca o registro com lapide.
@@ -329,8 +257,7 @@ public class CRUD {
         arquivo.readFully(dados);
 
         // Cria Registro.
-        Registro registro =
-                new Registro(0, "", "", "", "", 0);
+        Registro registro = new Registro(0, "", "", "", "", 0);
 
         // Converte bytes.
         registro.fromByteArray(dados);
@@ -362,6 +289,13 @@ public class CRUD {
         arquivo.close();
 
         return true;
+    }
+
+    // Retorna a arvore B.
+    // Pode ser usada pelo Main para mostrar a arvore.
+    public static ArvoreB getArvore() {
+
+        return arvore;
     }
 }
 
