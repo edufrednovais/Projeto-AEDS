@@ -102,11 +102,8 @@ public class ArvoreB {
         return buscar(no.filhos[i], id);
     }
 
-
-    // =========================================================
     // INSERÇÃO
-    // =========================================================
-
+   
     public void inserir(int id, long posicao) {
 
         // Se a árvore ainda está vazia.
