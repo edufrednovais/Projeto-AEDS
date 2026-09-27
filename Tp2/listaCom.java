@@ -317,14 +317,14 @@ class Lista {
         ultimo = primeiro;
     }
 
-    // Insere um ID no final da lista.
+    // Insere um ID no final da lista
     public void inserirFim(int elemento) {
 
         ultimo.prox = new Celula(elemento);
         ultimo = ultimo.prox;
     }
 
-    // Procura um ID dentro da lista.
+    // Procura um ID dentro da lista
     public boolean pesquisar(int elemento) {
 
         Celula i = primeiro.prox;
@@ -341,7 +341,7 @@ class Lista {
         return false;
     }
 
-    // Retorna o tamanho da lista.
+    // Retorna o tamanho da lista
     public int tamanho() {
 
         int tamanho = 0;
@@ -358,7 +358,7 @@ class Lista {
         return tamanho;
     }
 
-    // Remove um ID da lista.
+    // Remove um ID da lista
     public void removerValor(int elemento) {
 
         Celula anterior = primeiro;
@@ -382,7 +382,7 @@ class Lista {
         }
     }
 
-    // Mostra todos os IDs da lista.
+    // Mostra todos os IDs da lista
     public void mostrar() {
 
         Celula i = primeiro.prox;
@@ -395,7 +395,7 @@ class Lista {
         }
     }
 
-    // Mostra a interseção entre duas listas.
+    // Mostra a interseção entre duas listas
     public void mostrarIntersecao(Lista outra) {
 
         Celula i = primeiro.prox;
@@ -418,9 +418,7 @@ class Lista {
 }
 
 
-// ============================================================
-// CELULA DA LISTA INVERTIDA
-// ============================================================
+// aqui comeeça a invertida
 
 class CelulaInvertida {
 
@@ -437,9 +435,6 @@ class CelulaInvertida {
 }
 
 
-// ============================================================
-// LISTA INVERTIDA
-// ============================================================
 
 class ListaInvertida {
 
@@ -452,17 +447,17 @@ class ListaInvertida {
         ultimo = primeiro;
     }
 
-    // Insere uma palavra e o ID correspondente.
+    // Insere uma palavra e o ID correspondente
     public void inserir(String palavra, int id) {
 
         CelulaInvertida i = primeiro.prox;
 
         while (i != null) {
 
-            // Se a palavra já existe.
+            
             if (i.palavra.equals(palavra)) {
 
-                // Evita colocar o mesmo ID duas vezes.
+               // evita 2 id igual
                 if (!i.ids.pesquisar(id)) {
 
                     i.ids.inserirFim(id);
@@ -474,8 +469,7 @@ class ListaInvertida {
             i = i.prox;
         }
 
-        // Se a palavra ainda não existe,
-        // cria uma nova célula.
+        // Se a palavra ainda não existe cria uma nova célula.
         CelulaInvertida nova =
                 new CelulaInvertida(palavra);
 
@@ -485,8 +479,6 @@ class ListaInvertida {
         ultimo = nova;
     }
 
-    // Pesquisa uma palavra na lista invertida.
-    // Retorna os IDs relacionados a ela.
     public Lista pesquisar(String palavra) {
 
         CelulaInvertida i = primeiro.prox;
@@ -501,11 +493,11 @@ class ListaInvertida {
             i = i.prox;
         }
 
-        // Se não encontrar, retorna lista vazia.
+     
         return new Lista();
     }
 
-    // Remove um ID associado a uma palavra.
+
     public void remover(String palavra, int id) {
 
         CelulaInvertida anterior = primeiro;
@@ -517,8 +509,7 @@ class ListaInvertida {
 
                 atual.ids.removerValor(id);
 
-                // Se não sobrou nenhum ID para a palavra,
-                // remove também a palavra da lista invertida.
+              
                 if (atual.ids.tamanho() == 0) {
 
                     anterior.prox = atual.prox;
@@ -536,7 +527,7 @@ class ListaInvertida {
         }
     }
 
-    // Mostra toda a lista invertida.
+  
     public void mostrar() {
 
         CelulaInvertida i = primeiro.prox;
@@ -553,9 +544,7 @@ class ListaInvertida {
         }
     }
 
-    // ========================================================
-    // SALVAR A LISTA EM ARQUIVO
-    // ========================================================
+    // salva a lista em arquivo
 
     public void salvarArquivo(String nomeArquivo)
             throws IOException {
@@ -564,7 +553,7 @@ class ListaInvertida {
                 new DataOutputStream(
                         new FileOutputStream(nomeArquivo));
 
-        // Conta quantas palavras existem.
+        // Conta quantas palavras existem
         int quantidadePalavras = 0;
 
         CelulaInvertida i = primeiro.prox;
@@ -576,14 +565,14 @@ class ListaInvertida {
             i = i.prox;
         }
 
-        // Grava a quantidade de palavras.
+        // Grava a quantidade de palavras
         arquivo.writeInt(quantidadePalavras);
 
         i = primeiro.prox;
 
         while (i != null) {
 
-            // Converte a palavra para bytes.
+            // Converte a palavra para bytes
             byte[] palavraBytes =
                     i.palavra.getBytes("UTF-8");
 
@@ -612,9 +601,7 @@ class ListaInvertida {
         arquivo.close();
     }
 
-    // ========================================================
-    // CARREGAR A LISTA DO ARQUIVO
-    // ========================================================
+
 
     public void carregarArquivo(String nomeArquivo)
             throws IOException {
@@ -673,10 +660,7 @@ class ListaInvertida {
     }
 }
 
-
-// ============================================================
-// DUAS LISTAS INVERTIDAS
-// ============================================================
+// agora dobra a listas
 
 class DuasListasInvertidas {
 
@@ -689,9 +673,6 @@ class DuasListasInvertidas {
         listaAway = new ListaInvertida();
     }
 
-    // ========================================================
-    // INSERIR NAS DUAS LISTAS
-    // ========================================================
 
     public void inserir(String homeTeam,
                         String awayTeam,
@@ -704,10 +685,7 @@ class DuasListasInvertidas {
         listaAway.inserir(awayTeam, id);
     }
 
-    // ========================================================
-    // REMOVER DAS DUAS LISTAS
-    // ========================================================
-
+   
     public void remover(String homeTeam,
                         String awayTeam,
                         int id) {
@@ -731,9 +709,7 @@ class DuasListasInvertidas {
         return listaAway.pesquisar(awayTeam);
     }
 
-    // ========================================================
-    // PESQUISA USANDO AS DUAS LISTAS
-    // ========================================================
+
 
     public void pesquisarDuasListas(String homeTeam,
                                     String awayTeam) {
@@ -767,9 +743,6 @@ class DuasListasInvertidas {
         listaAway.mostrar();
     }
 
-    // ========================================================
-    // SALVAR OS DOIS ARQUIVOS
-    // ========================================================
 
     public void salvarArquivos()
             throws IOException {
@@ -779,9 +752,6 @@ class DuasListasInvertidas {
         listaAway.salvarArquivo("listaAway.dat");
     }
 
-    // ========================================================
-    // CARREGAR OS DOIS ARQUIVOS
-    // ========================================================
 
     public void carregarArquivos()
             throws IOException {
@@ -844,10 +814,7 @@ class CRUD {
         }
     }
 
-    // ============================================================
-    // CREATE
-    // ============================================================
-
+    
     public static void CRIATE(Registro registro) throws IOException {
 
         carregarListas();
@@ -868,10 +835,7 @@ class CRUD {
         // Transforma o Registro em bytes.
         byte[] dados = registro.toByteArray();
 
-        // ========================================================
-        // GRAVA O REGISTRO
-        // [lapide][tamanho][dados]
-        // ========================================================
+        
 
         arquivo.writeByte(lapide);
         arquivo.writeInt(dados.length);
@@ -879,9 +843,7 @@ class CRUD {
 
         arquivo.close();
 
-        // ========================================================
-        // ATUALIZA O ÍNDICE
-        // ========================================================
+     
 
         RandomAccessFile indice =
                 new RandomAccessFile("indice.dat", "rw");
@@ -897,9 +859,6 @@ class CRUD {
 
         indice.close();
 
-        // ========================================================
-        // ATUALIZA AS LISTAS INVERTIDAS
-        // ========================================================
 
         listas.inserir(
                 registro.homeTeam,
@@ -910,9 +869,6 @@ class CRUD {
         listas.salvarArquivos();
     }
 
-    // ============================================================
-    // BUSCAR POSIÇÃO NO ÍNDICE
-    // ============================================================
 
     private static long buscarIndice(int id) throws IOException {
 
@@ -945,9 +901,6 @@ class CRUD {
         return -1;
     }
 
-    // ============================================================
-    // READ
-    // ============================================================
 
     public static Registro READ(int id) throws IOException {
 
@@ -966,9 +919,7 @@ class CRUD {
         // Vai diretamente para a posição.
         arquivo.seek(posicao);
 
-        // ========================================================
-        // LÊ A LÁPIDE
-        // ========================================================
+
 
         byte lapide = arquivo.readByte();
 
@@ -983,9 +934,7 @@ class CRUD {
 
         arquivo.close();
 
-        // ========================================================
-        // VERIFICA SE ESTÁ APAGADO
-        // ========================================================
+
 
         if (lapide == 1) {
             return null;
@@ -1010,10 +959,6 @@ class CRUD {
         return registro;
     }
 
-    // ============================================================
-    // UPDATE
-    // ============================================================
-
     public static boolean UPDATE(
             int id,
             Registro novoRegistro) throws IOException {
@@ -1035,9 +980,7 @@ class CRUD {
         // Vai diretamente para o registro.
         arquivo.seek(posicao);
 
-        // ========================================================
-        // LÊ O REGISTRO ANTIGO
-        // ========================================================
+
 
         byte lapide = arquivo.readByte();
 
@@ -1081,9 +1024,7 @@ class CRUD {
         byte[] novosDados =
                 novoRegistro.toByteArray();
 
-        // ========================================================
-        // CASO 1 - MESMO TAMANHO
-        // ========================================================
+
 
         if (novosDados.length == tamanho) {
 
@@ -1122,15 +1063,9 @@ class CRUD {
             return true;
         }
 
-        // ========================================================
-        // CASO 2 - TAMANHO DIFERENTE
-        // ========================================================
 
         else {
 
-            // ====================================================
-            // MARCA O REGISTRO ANTIGO COMO APAGADO
-            // ====================================================
 
             arquivo.seek(posicao);
 
@@ -1143,10 +1078,7 @@ class CRUD {
             // Mantém os dados antigos.
             arquivo.write(dados);
 
-            // ====================================================
-            // GRAVA O NOVO REGISTRO NO FINAL
-            // ====================================================
-
+    
             arquivo.seek(arquivo.length());
 
             // Guarda a nova posição.
@@ -1164,15 +1096,10 @@ class CRUD {
 
             arquivo.close();
 
-            // ====================================================
-            // ATUALIZA O ÍNDICE
-            // ====================================================
+
 
             atualizarIndice(id, novaPosicao);
 
-            // ====================================================
-            // ATUALIZA AS LISTAS INVERTIDAS
-            // ====================================================
 
             // Remove os dados antigos.
             listas.remover(
@@ -1195,9 +1122,7 @@ class CRUD {
         }
     }
 
-    // ============================================================
-    // ATUALIZAR ÍNDICE
-    // ============================================================
+
 
     private static void atualizarIndice(
             int id,
@@ -1236,9 +1161,6 @@ class CRUD {
         indice.close();
     }
 
-    // ============================================================
-    // DELETE
-    // ============================================================
 
     public static boolean excluir(int id) throws IOException {
 
@@ -1258,10 +1180,6 @@ class CRUD {
 
         // Vai até o registro.
         arquivo.seek(posicao);
-
-        // ========================================================
-        // LÊ O REGISTRO
-        // ========================================================
 
         byte lapide = arquivo.readByte();
 
@@ -1298,9 +1216,7 @@ class CRUD {
         String homeAntigo = registro.homeTeam;
         String awayAntigo = registro.awayTeam;
 
-        // ========================================================
-        // MARCA COMO APAGADO
-        // ========================================================
+ 
 
         arquivo.seek(posicao);
 
@@ -1315,9 +1231,7 @@ class CRUD {
 
         arquivo.close();
 
-        // ========================================================
-        // REMOVE DAS LISTAS INVERTIDAS
-        // ========================================================
+
 
         listas.remover(
                 homeAntigo,
