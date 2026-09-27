@@ -2,7 +2,7 @@
 import java.io.RandomAccessFile;
 import java.io.IOException;
 
-public class CRUD {
+public class CRUDindex {
     // A arvore B passa a ser o nosso indice.
     // Ela guarda:
     // ID -> posicao do registro no jogos.dat
