@@ -1,5 +1,3 @@
-import java.io.RandomAccessFile;
-import java.io.IOException;
 
 public class ArvoreB {
     // Ordem da arvore
@@ -39,18 +37,22 @@ public class ArvoreB {
             quantidade = 0;
         }
     }
+
     // raiz
     private No raiz;
+
     //Construtor da raiz
 
     public ArvoreB() {
 
         raiz = null;
     }
+
     // Busca, no caso o metodo de gatilho pro recursivo
     // Recebe um ID e retorna a posicao dele no jogos.dat.
     // Se nao encontrar:
     // retorna -1.
+
     public long buscar(int id) {
 
         if (raiz == null) {
@@ -139,7 +141,7 @@ public class ArvoreB {
 
         if (raiz.quantidade == MAX_CHAVES) {
 
-            No novaRaiz =new No(false);
+            No novaRaiz = new No(false);
 
             novaRaiz.filhos[0] = raiz;
 
@@ -150,13 +152,13 @@ public class ArvoreB {
 
         // Insere
 
-        inserirNaoCheio( raiz, id,posicao);
+        inserirNaoCheio(raiz, id, posicao);
     }
 
     //Inserir em No nao cheio
     
 
-    private void inserirNaoCheio(No no,int id,long posicao) {
+    private void inserirNaoCheio(No no, int id, long posicao) {
 
         int i = no.quantidade - 1;
 
@@ -195,7 +197,7 @@ public class ArvoreB {
         // Descobre em qual filho devemos entrar.
 
         while (i >= 0 && id < no.ids[i]) {
-             i--;
+            i--;
         }
 
         i++;
@@ -218,12 +220,12 @@ public class ArvoreB {
             }
         }
 
-        inserirNaoCheio(no.filhos[i],id,posicao);
+        inserirNaoCheio(no.filhos[i], id, posicao);
     }
 
     // Divide o filho pra que ocorra a fraqmentacao sem lascar o pai e o balanceamento
 
-    private void dividirFilho(No pai,int indice) {
+    private void dividirFilho(No pai, int indice) {
 
         // Filho que esta cheio.
 
@@ -241,6 +243,7 @@ public class ArvoreB {
         // [10]     [30]
         //       20
         // essa e a logica
+
         int meio = 1;
 
 
@@ -278,7 +281,7 @@ public class ArvoreB {
 
         // Abrir espacos dos filhos pro pai
        
-        int j =  pai.quantidade;
+        int j = pai.quantidade;
 
         while (j >= indice + 1) {
 
@@ -322,19 +325,19 @@ public class ArvoreB {
     // Usado principalmente quando o UPDATE do CRUD
     // coloca o registro em uma nova posicao.
     
-    public boolean atualizar(int id,long novaPosicao) {
+    public boolean atualizar(int id, long novaPosicao) {
 
         if (raiz == null) {
 
             return false;
         }
 
-        return atualizar(raiz,id,novaPosicao);
+        return atualizar(raiz, id, novaPosicao);
     }
 
     // Atualizacao recursiva pra nao perder 
 
-    private boolean atualizar( No no, int id, long novaPosicao) {
+    private boolean atualizar(No no, int id, long novaPosicao) {
 
         int i = 0;
 
@@ -361,7 +364,7 @@ public class ArvoreB {
             return false;
         }
 
-        return atualizar(no.filhos[i],id,novaPosicao);
+        return atualizar(no.filhos[i], id, novaPosicao);
     }
 
 
@@ -380,7 +383,7 @@ public class ArvoreB {
             return false;
         }
 
-        return remover(raiz,id);
+        return remover(raiz, id);
     }
 
 
@@ -390,11 +393,13 @@ public class ArvoreB {
     // Para um trabalho que exija remocao completa da arvore B
     // com redistribuicao e fusao de nos, essa parte precisa
     // ser expandida.
-    private boolean remover(No no,int id) {
+
+    private boolean remover(No no, int id) {
+
         int i = 0;
 
         while (i < no.quantidade && id > no.ids[i]) {
-                        i++;
+            i++;
         }
 
         // Encontrou.
@@ -432,31 +437,34 @@ public class ArvoreB {
             return false;
         }
 
-        return remover( no.filhos[i],id);
+        return remover(no.filhos[i], id);
     }
 
 
    // metodo mostrar 
+
     public void mostrar() {
 
         if (raiz == null) {
 
             System.out.println("Arvore vazia.");
+
             return;
         }
 
-        mostrar( raiz, 0);
+        mostrar(raiz, 0);
     }
 
 
-    private void mostrar( No no,int nivel) {
+    private void mostrar(No no, int nivel) {
 
 
         // Espaçamento para representar
         // os níveis da árvore.
 
-        for (int i = 0; i < nivel;i++) {
-                System.out.print("    ");
+        for (int i = 0; i < nivel; i++) {
+
+            System.out.print("    ");
         }
 
 
@@ -465,7 +473,7 @@ public class ArvoreB {
 
         for (int i = 0; i < no.quantidade; i++) {
 
-            System.out.print(no.ids[i] );
+            System.out.print(no.ids[i]);
 
             System.out.print(" -> ");
 
@@ -474,7 +482,7 @@ public class ArvoreB {
 
             if (i < no.quantidade - 1) {
 
-                System.out.print( " | ");
+                System.out.print(" | ");
             }
         }
 
