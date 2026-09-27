@@ -1,3 +1,4 @@
+
 import java.io.RandomAccessFile;
 import java.io.IOException;
 
@@ -15,7 +16,7 @@ public class CRUD {
         long posicao = arquivo.getFilePointer();
 
         // Registro novo começa ativo.
-        registro.lapide = false;
+        registro.lapide = 0;
 
         // Transforma o registro em bytes.
         byte[] dados = registro.toByteArray();
@@ -30,8 +31,8 @@ public class CRUD {
         arquivo.close();
 
 
-      // Arthurrrrr aqui comeca as alteracoes.
-      // Aqui atualiza o indice
+        // Arthurrrrr aqui comeca as alteracoes.
+        // Aqui atualiza o indice
 
         RandomAccessFile indice = new RandomAccessFile("indice.dat", "rw");
 
@@ -49,7 +50,8 @@ public class CRUD {
     }
 
 
-   
+
+
     // Buscar a posicao do indice.
     // Recebe um ID e retorna a posição dele no jogos.dat.
     // Se não encontrar, retorna -1.
@@ -83,7 +85,8 @@ public class CRUD {
 
         return -1;
     }
-   
+
+
     // READ
     // Busca um registro utilizando o indice.
     // Diferente do CRUD sequencial, nao percorremos todos, essa alteracao muda muito pra quando a gente trabalhar com arvore
@@ -121,7 +124,7 @@ public class CRUD {
         registro.fromByteArray(dados);
 
         // Verifica se o registro esta ativo.
-        if (registro.lapide) {
+        if (registro.lapide == 1) {
 
             arquivo.close();
 
@@ -133,6 +136,7 @@ public class CRUD {
 
         return registro;
     }
+
 
     // UPDATE
 
@@ -169,7 +173,7 @@ public class CRUD {
         registro.fromByteArray(dados);
 
         // Verifica se o registro esta ativo.
-        if (registro.lapide) {
+        if (registro.lapide == 1) {
 
             arquivo.close();
 
@@ -180,7 +184,7 @@ public class CRUD {
         novoRegistro.id = id;
 
         // Registro novo fica ativo.
-        novoRegistro.lapide = false;
+        novoRegistro.lapide = 0;
 
         // Converte o novo registro para bytes.
         byte[] novosDados =
@@ -207,12 +211,13 @@ public class CRUD {
 
             return true;
         }
+
         // CASO 2
         // Tamanho diferente
         else {
 
             // Marca o registro antigo como apagado.
-            registro.lapide = true;
+            registro.lapide = 1;
 
             // Converte novamente.
             byte[] registroApagado = registro.toByteArray();
@@ -226,8 +231,9 @@ public class CRUD {
             // Grava o registro com lapide.
             arquivo.write(registroApagado);
 
+
             // NOVO REGISTRO
-            
+
             // Vai para o final do arquivo.
             arquivo.seek(arquivo.length());
 
@@ -243,6 +249,7 @@ public class CRUD {
             // Fecha o arquivo.
             arquivo.close();
 
+
             // ATUALIZA O ÍNDICE
 
             atualizarIndice(id, novaPosicao);
@@ -250,6 +257,8 @@ public class CRUD {
             return true;
         }
     }
+
+
     // ATUALIZAR ÍNDICE
     // Usado quando o UPDATE precisa colocar o registro
     // no final do arquivo.
@@ -257,7 +266,8 @@ public class CRUD {
             int id,
             long novaPosicao) throws IOException {
 
-        RandomAccessFile indice = new RandomAccessFile("indice.dat", "rw");
+        RandomAccessFile indice =
+                new RandomAccessFile("indice.dat", "rw");
 
         // Procura o ID dentro do indice.
         while (indice.getFilePointer() < indice.length()) {
@@ -291,6 +301,7 @@ public class CRUD {
         indice.close();
     }
 
+
     // DELETE
     // Marca o registro com lapide.
     // O registro continua no jogos.dat,
@@ -306,7 +317,8 @@ public class CRUD {
         }
 
         // Abre o arquivo.
-        RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "rw");
+        RandomAccessFile arquivo =
+                new RandomAccessFile("jogos.dat", "rw");
 
         // Vai diretamente para o registro.
         arquivo.seek(posicao);
@@ -321,13 +333,14 @@ public class CRUD {
         arquivo.readFully(dados);
 
         // Cria Registro.
-        Registro registro = new Registro(0, "", "", "", "", 0);
+        Registro registro =
+                new Registro(0, "", "", "", "", 0);
 
         // Converte bytes.
         registro.fromByteArray(dados);
 
         // Verifica se ja esta apagado.
-        if (registro.lapide) {
+        if (registro.lapide == 1) {
 
             arquivo.close();
 
@@ -335,10 +348,11 @@ public class CRUD {
         }
 
         // Marca como apagado.
-        registro.lapide = true;
+        registro.lapide = 1;
 
         // Converte novamente.
-        byte[] novosDados = registro.toByteArray();
+        byte[] novosDados =
+                registro.toByteArray();
 
         // Volta para o inicio do registro.
         arquivo.seek(posicao);
@@ -355,3 +369,4 @@ public class CRUD {
         return true;
     }
 }
+
