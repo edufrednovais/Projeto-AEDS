@@ -262,12 +262,9 @@ public class CRUD {
     // ATUALIZAR ÍNDICE
     // Usado quando o UPDATE precisa colocar o registro
     // no final do arquivo.
-    private static void atualizarIndice(
-            int id,
-            long novaPosicao) throws IOException {
+    private static void atualizarIndice(int id,long novaPosicao) throws IOException {
 
-        RandomAccessFile indice =
-                new RandomAccessFile("indice.dat", "rw");
+        RandomAccessFile indice = new RandomAccessFile("indice.dat", "rw");
 
         // Procura o ID dentro do indice.
         while (indice.getFilePointer() < indice.length()) {
@@ -317,8 +314,7 @@ public class CRUD {
         }
 
         // Abre o arquivo.
-        RandomAccessFile arquivo =
-                new RandomAccessFile("jogos.dat", "rw");
+        RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "rw");
 
         // Vai diretamente para o registro.
         arquivo.seek(posicao);
@@ -351,8 +347,7 @@ public class CRUD {
         registro.lapide = 1;
 
         // Converte novamente.
-        byte[] novosDados =
-                registro.toByteArray();
+        byte[] novosDados = registro.toByteArray();
 
         // Volta para o inicio do registro.
         arquivo.seek(posicao);
