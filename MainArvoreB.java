@@ -60,14 +60,12 @@ public class MainArvoreB {
                             campVariavel,
                             data,
                             lista,
-                            valor
-                    );
+                            valor);
 
-                    CRUDindex.CRIATE(registro);
+                    CRUDIndex.CRIATE(registro);
 
                     System.out.println("\nRegistro criado com sucesso!");
                 }
-
 
                 // READ
                 else if (opcao == 2) {
@@ -78,7 +76,7 @@ public class MainArvoreB {
                     int id = scanner.nextInt();
                     scanner.nextLine();
 
-                    Registro registro = CRUDindex.READ(id);
+                    Registro registro = CRUDIndex.READ(id);
 
                     if (registro == null) {
 
@@ -90,7 +88,6 @@ public class MainArvoreB {
                         System.out.println(registro.ToString());
                     }
                 }
-
 
                 // UPDATE
                 else if (opcao == 3) {
@@ -123,11 +120,9 @@ public class MainArvoreB {
                             campVariavel,
                             data,
                             lista,
-                            valor
-                    );
+                            valor);
 
-                    boolean sucesso =
-                            CRUDindex.UPDATE(id, novoRegistro);
+                    boolean sucesso = CRUDIndex.UPDATE(id, novoRegistro);
 
                     if (sucesso) {
 
@@ -139,7 +134,6 @@ public class MainArvoreB {
                     }
                 }
 
-
                 // DELETE
                 else if (opcao == 4) {
 
@@ -149,8 +143,7 @@ public class MainArvoreB {
                     int id = scanner.nextInt();
                     scanner.nextLine();
 
-                    boolean sucesso =
-                            CRUDindex.excluir(id);
+                    boolean sucesso = CRUDIndex.excluir(id);
 
                     if (sucesso) {
 
@@ -162,15 +155,13 @@ public class MainArvoreB {
                     }
                 }
 
-
                 // MOSTRAR ARVORE
                 else if (opcao == 5) {
 
                     System.out.println("\n===== ARVORE B =====");
 
-                    CRUDindex.getArvore().mostrar();
+                    CRUDIndex.getArvore().mostrar();
                 }
-
 
                 // SAIR
                 else if (opcao == 0) {
@@ -178,7 +169,6 @@ public class MainArvoreB {
                     System.out.println("\nPrograma encerrado.");
 
                 }
-
 
                 // OPCAO INVALIDA
                 else {
@@ -196,4 +186,3 @@ public class MainArvoreB {
         scanner.close();
     }
 }
-

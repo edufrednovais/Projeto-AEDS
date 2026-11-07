@@ -1,301 +1,121 @@
-```java
-import java.io.RandomAccessFile;
+import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
-public class CRUDindex {
-    // A arvore B passa a ser o nosso indice.
-    // Ela guarda:
-    // ID -> posicao do registro no jogos.dat
-    private static ArvoreB arvore = new ArvoreB();
+public class CRUDIndex {
 
+    private static final String ARQUIVO = "jogos.dat";
+
+    // Lê o registro que começa na posição atual do arquivo.
+    // Formato de cada registro no arquivo: [int tamanho][bytes do registro]
+    private static Registro lerRegistro(RandomAccessFile arq) throws IOException {
+        int tamanho = arq.readInt();
+        byte[] dados = new byte[tamanho];
+        arq.readFully(dados);
+        Registro r = new Registro(0, "", "", "", "", 0);
+        r.fromByteArray(dados);
+        return r;
+    }
+
+    // Busca sequencial: percorre o arquivo do início ao fim procurando um registro
+    // ATIVO (lápide 0) com o ID informado. Retorna a posição onde ele começa,
+    // ou -1 se não encontrar. Registros com lápide 1 são ignorados.
+    private static long buscarPosicao(int id) throws IOException {
+        File f = new File(ARQUIVO);
+        if (!f.exists())
+            return -1;
+
+        try (RandomAccessFile arq = new RandomAccessFile(f, "r")) {
+            while (arq.getFilePointer() < arq.length()) {
+                long pos = arq.getFilePointer(); // início deste registro
+                Registro r = lerRegistro(arq);
+                if (r.lapide == 0 && r.id == id)
+                    return pos;
+            }
+        }
+        return -1;
+    }
+
+    // CREATE: grava o novo registro no final do arquivo.
     public static void CRIATE(Registro registro) throws IOException {
-
-        // Abre o arquivo principal o mesmo nosso.
-        RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "rw");
-
-        // Vai para o final do arquivo.
-        arquivo.seek(arquivo.length());
-
-        // Guarda a posicao onde o registro vai começar mesma coisa do sequencial.
-        long posicao = arquivo.getFilePointer();
-
-        // Registro novo começa ativo.
-        registro.lapide = 0;
-
-        // Transforma o registro em bytes.
-        byte[] dados = registro.toByteArray();
-
-        // Grava o tamanho do registro.
-        arquivo.writeInt(dados.length);
-
-        // Grava os dados.
-        arquivo.write(dados);
-
-        // Fecha o arquivo principal.
-        arquivo.close();
-
-        // Arthurrrrr aqui comeca as alteracoes.
-        // Aqui atualiza o indice
-
-        // Insere no indice da arvore B:
-        // ID -> posicao no jogos.dat
-        arvore.inserir(registro.id, posicao);
+        try (RandomAccessFile arq = new RandomAccessFile(ARQUIVO, "rw")) {
+            arq.seek(arq.length()); // vai para o final
+            registro.lapide = 0; // registro novo começa ativo
+            byte[] dados = registro.toByteArray();
+            arq.writeInt(dados.length); // tamanho antes dos dados
+            arq.write(dados);
+        }
     }
 
-    // Buscar a posicao do indice.
-    // Recebe um ID e retorna a posição dele no jogos.dat.
-    // Se não encontrar, retorna -1.
-    // Codicao base irmao
-    private static long buscarIndice(int id) throws IOException {
-
-        // Procura diretamente na arvore B.
-        return arvore.buscar(id);
-    }
-    // READ
-    // Busca um registro utilizando o indice.
-    // Diferente do CRUD sequencial, nao percorremos todos, essa alteracao muda muito pra quando a gente trabalhar com arvore
-    // os registros do jogos.dat.
-
+    // READ: retorna o registro ativo com o ID, ou null se não existir.
     public static Registro READ(int id) throws IOException {
-
-        // Primeiro procura a posicao no indice.
-        long posicao = buscarIndice(id);
-
-        // Se nao encontrou no indice.
-        if (posicao == -1) {
+        long pos = buscarPosicao(id);
+        if (pos == -1)
             return null;
-        }
 
-        // Abre o arquivo principal.
-        RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "r");
-
-        // Vai diretamente para a posicao encontrada.
-        arquivo.seek(posicao);
-
-        // Le o tamanho do registro.
-        int tamanho = arquivo.readInt();
-
-        // Cria o vetor de bytes.
-        byte[] dados = new byte[tamanho];
-
-        // Le os dados.
-        arquivo.readFully(dados);
-
-        // Cria um Registro vazio.
-        Registro registro = new Registro(0, "", "", "", "", 0);
-
-        // Converte os bytes para registro.
-        registro.fromByteArray(dados);
-
-        // Verifica se o registro esta ativo.
-        if (registro.lapide == 1) {
-
-            arquivo.close();
-
-            return null;
-        }
-
-        // Fecha o arquivo.
-        arquivo.close();
-
-        return registro;
-    }
-    // UPDATE
-    public static boolean UPDATE(int id, Registro novoRegistro)
-            throws IOException {
-
-        // Procura a posicao utilizando o indice.
-        long posicao = buscarIndice(id);
-
-        // Se nao encontrou o ID.
-        if (posicao == -1) {
-            return false;
-        }
-
-        // Abre o arquivo principal.
-        RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "rw");
-
-        // Vai diretamente para a posicao.
-        arquivo.seek(posicao);
-
-        // Le o tamanho do registro.
-        int tamanho = arquivo.readInt();
-
-        // Cria vetor para os dados.
-        byte[] dados = new byte[tamanho];
-
-        // Le os dados.
-        arquivo.readFully(dados);
-
-        // Cria Registro temporario.
-        Registro registro = new Registro(0, "", "", "", "", 0);
-
-        // Converte bytes para Registro.
-        registro.fromByteArray(dados);
-
-        // Verifica se o registro esta ativo.
-        if (registro.lapide == 1) {
-
-            arquivo.close();
-
-            return false;
-        }
-
-        // Mantem o mesmo ID.
-        novoRegistro.id = id;
-
-        // Registro novo fica ativo.
-        novoRegistro.lapide = 0;
-
-        // Converte o novo registro para bytes.
-        byte[] novosDados =
-                novoRegistro.toByteArray();
-
-        // CASO 1
-        // Mesmo tamanho
-
-        if (novosDados.length == tamanho) {
-
-            // Voltamos para o começo do registro.
-            arquivo.seek(posicao);
-
-            // Grava o tamanho.
-            arquivo.writeInt(novosDados.length);
-
-            // Grava os novos dados.
-            arquivo.write(novosDados);
-
-            // A posicao nao mudou.
-            // Portanto, o índice continua correto.
-
-            arquivo.close();
-
-            return true;
-        }
-
-        // CASO 2
-        // Tamanho diferente
-        else {
-
-            // Marca o registro antigo como apagado.
-            registro.lapide = 1;
-
-            // Converte novamente.
-            byte[] registroApagado = registro.toByteArray();
-
-            // Volta para a posicao antiga.
-            arquivo.seek(posicao);
-
-            // Grava o tamanho antigo.
-            arquivo.writeInt(registroApagado.length);
-
-            // Grava o registro com lapide.
-            arquivo.write(registroApagado);
-
-            // NOVO REGISTRO
-
-            // Vai para o final do arquivo.
-            arquivo.seek(arquivo.length());
-
-            // Guarda a nova posicao.
-            long novaPosicao = arquivo.getFilePointer();
-
-            // Grava tamanho do novo registro.
-            arquivo.writeInt(novosDados.length);
-
-            // Grava o novo registro.
-            arquivo.write(novosDados);
-
-            // Fecha o arquivo.
-            arquivo.close();
-
-            // ATUALIZA O ÍNDICE
-
-            atualizarIndice(id, novaPosicao);
-
-            return true;
+        try (RandomAccessFile arq = new RandomAccessFile(ARQUIVO, "r")) {
+            arq.seek(pos);
+            return lerRegistro(arq);
         }
     }
 
-    // ATUALIZAR ÍNDICE
-    // Usado quando o UPDATE precisa colocar o registro
-    // no final do arquivo.
-    private static void atualizarIndice(int id, long novaPosicao) throws IOException {
-        // Procura o ID dentro da arvore B.
-        // Como a arvore ja possui o ID,
-        // apenas atualizamos a posicao.
-        arvore.atualizar(id, novaPosicao);
-    }
-
-    // DELETE
-    // Marca o registro com lapide.
-    // O registro continua no jogos.dat,
-    // mas nao pode mais ser retornado pelo READ.
-    public static boolean excluir(int id) throws IOException {
-
-        // Procura a posicao no indice.
-        long posicao = buscarIndice(id);
-
-        // Nao encontrou.
-        if (posicao == -1) {
+    // UPDATE: se o novo registro tiver o mesmo tamanho, sobrescreve no lugar.
+    // Se o tamanho mudar, marca o antigo com lápide e grava o novo no final.
+    public static boolean UPDATE(int id, Registro novoRegistro) throws IOException {
+        long pos = buscarPosicao(id);
+        if (pos == -1)
             return false;
+
+        try (RandomAccessFile arq = new RandomAccessFile(ARQUIVO, "rw")) {
+            arq.seek(pos);
+            int tamanhoAntigo = arq.readInt();
+            byte[] dadosAntigos = new byte[tamanhoAntigo];
+            arq.readFully(dadosAntigos);
+
+            novoRegistro.id = id; // o ID nunca muda
+            novoRegistro.lapide = 0;
+            byte[] novosDados = novoRegistro.toByteArray();
+
+            if (novosDados.length == tamanhoAntigo) {
+                // Mesmo tamanho: sobrescreve na mesma posição
+                arq.seek(pos);
+                arq.writeInt(novosDados.length);
+                arq.write(novosDados);
+            } else {
+                // Tamanho diferente: apaga o antigo (lápide = 1)...
+                Registro antigo = new Registro(0, "", "", "", "", 0);
+                antigo.fromByteArray(dadosAntigos);
+                antigo.lapide = 1;
+                byte[] apagado = antigo.toByteArray();
+                arq.seek(pos);
+                arq.writeInt(apagado.length);
+                arq.write(apagado);
+
+                // ...e grava o novo no final do arquivo
+                arq.seek(arq.length());
+                arq.writeInt(novosDados.length);
+                arq.write(novosDados);
+            }
         }
-
-        // Abre o arquivo.
-        RandomAccessFile arquivo = new RandomAccessFile("jogos.dat", "rw");
-
-        // Vai diretamente para o registro.
-        arquivo.seek(posicao);
-
-        // Le o tamanho.
-        int tamanho = arquivo.readInt();
-
-        // Cria vetor.
-        byte[] dados = new byte[tamanho];
-
-        // Le os dados.
-        arquivo.readFully(dados);
-
-        // Cria Registro.
-        Registro registro = new Registro(0, "", "", "", "", 0);
-
-        // Converte bytes.
-        registro.fromByteArray(dados);
-
-        // Verifica se ja esta apagado.
-        if (registro.lapide == 1) {
-
-            arquivo.close();
-
-            return false;
-        }
-
-        // Marca como apagado.
-        registro.lapide = 1;
-
-        // Converte novamente.
-        byte[] novosDados = registro.toByteArray();
-
-        // Volta para o inicio do registro.
-        arquivo.seek(posicao);
-
-        // Grava o tamanho.
-        arquivo.writeInt(novosDados.length);
-
-        // Grava o registro com lapide.
-        arquivo.write(novosDados);
-
-        // Fecha o arquivo.
-        arquivo.close();
-
         return true;
     }
 
-    // Retorna a arvore B.
-    // Pode ser usada pelo Main para mostrar a arvore.
-    public static ArvoreB getArvore() {
+    // DELETE: exclusão lógica. Marca a lápide como 1; o registro continua no
+    // arquivo.
+    public static boolean excluir(int id) throws IOException {
+        long pos = buscarPosicao(id);
+        if (pos == -1)
+            return false;
 
-        return arvore;
+        try (RandomAccessFile arq = new RandomAccessFile(ARQUIVO, "rw")) {
+            arq.seek(pos);
+            Registro r = lerRegistro(arq);
+            r.lapide = 1;
+            byte[] dados = r.toByteArray();
+            arq.seek(pos);
+            arq.writeInt(dados.length);
+            arq.write(dados);
+        }
+        return true;
     }
 }
-
