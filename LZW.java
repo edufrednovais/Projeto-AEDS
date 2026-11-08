@@ -7,10 +7,9 @@ public class LZW implements Compressor {
     private static final int BITS_CODIGO = 12;
     private static final int MAX_ENTRADAS = 1 << BITS_CODIGO; // 4096
 
-    // ------------------------------------------------------------------
     // COMPRESSÃO
     // Formato do arquivo gerado: [long tamanhoOriginal][códigos de 12 bits...]
-    // ------------------------------------------------------------------
+
     @Override
     public void comprimir(String origem, String destino) throws IOException {
         long total = new File(origem).length();
@@ -61,11 +60,9 @@ public class LZW implements Compressor {
         }
     }
 
-    // ------------------------------------------------------------------
     // DESCOMPRESSÃO
     // O dicionário não está no arquivo: é reconstruído conforme os códigos são
     // lidos.
-    // ------------------------------------------------------------------
     @Override
     public void descomprimir(String origem, String destino) throws IOException {
         try (DataInputStream dis = new DataInputStream(
@@ -82,7 +79,7 @@ public class LZW implements Compressor {
             byte[][] dic = new byte[MAX_ENTRADAS][];
             int proximo = iniciarDicionario(dic);
 
-            byte[] anterior = null; // sequência do código anterior (null = início ou pós-reinício)
+            byte[] anterior = null; // sequência do código anterior
             long escritos = 0;
 
             while (escritos < total) {

@@ -3,9 +3,8 @@ import java.util.PriorityQueue;
 
 public class Huffman implements Compressor {
 
-    // ------------------------------------------------------------------
     // Nó da árvore de Huffman. Pode ser folha (guarda um byte) ou nó interno.
-    // ------------------------------------------------------------------
+
     private static class No implements Comparable<No> {
         int simbolo; // byte (0..255) se for folha; -1 se for nó interno
         long freq; // frequência (soma das frequências dos filhos, se interno)
@@ -77,12 +76,10 @@ public class Huffman implements Compressor {
         gerarCodigos(no.dir, prefixo + "1", codigos);
     }
 
-    // ------------------------------------------------------------------
     // COMPRESSÃO
     // Formato do arquivo gerado:
     // [long tamanhoOriginal][short qtdSimbolos][(byte simbolo, int freq) x
     // qtd][bits]
-    // ------------------------------------------------------------------
     @Override
     public void comprimir(String origem, String destino) throws IOException {
         // PASSADA 1: conta a frequência de cada byte
@@ -134,13 +131,12 @@ public class Huffman implements Compressor {
                     }
                 }
             }
-            bits.fechar(); // completa o último byte com padding e fecha o arquivo
+            bits.fechar();
         }
     }
 
-    // ------------------------------------------------------------------
     // DESCOMPRESSÃO
-    // ------------------------------------------------------------------
+
     @Override
     public void descomprimir(String origem, String destino) throws IOException {
         try (DataInputStream dis = new DataInputStream(

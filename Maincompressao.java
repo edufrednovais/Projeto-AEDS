@@ -5,22 +5,19 @@ import java.nio.file.StandardCopyOption;
 import java.util.Scanner;
 import java.nio.file.*;
 
-// =====================================================================
 // CONTRATO COMUM AOS DOIS ALGORITMOS
-// Trabalham arquivo -> arquivo (memória secundária), sem carregar tudo na RAM.
-// =====================================================================
+
 interface Compressor {
     void comprimir(String arquivoOrigem, String arquivoDestino) throws IOException;
 
     void descomprimir(String arquivoOrigem, String arquivoDestino) throws IOException;
 
-    String nome(); // "Huffman" ou "LZW"
+    String nome(); // Huffman ou LZW
 }
 
-// =====================================================================
 // BitOutput: acumula bits em um byte e grava no disco quando completa 8.
 // Necessário porque Huffman e LZW geram códigos de tamanho variável.
-// =====================================================================
+
 class BitOutput {
     private final OutputStream out;
     private int buffer = 0; // bits acumulados
@@ -30,8 +27,9 @@ class BitOutput {
         this.out = out;
     }
 
-    // Grava os 'qtd' bits menos significativos de 'valor', do mais significativo ao
-    // menos.
+    // Grava os 'quantidade' bits menos significativos de 'valor', do mais
+    // significativo ao menos
+
     public void escreverBits(int valor, int qtd) throws IOException {
         for (int i = qtd - 1; i >= 0; i--) {
             buffer = (buffer << 1) | ((valor >> i) & 1);
@@ -55,9 +53,8 @@ class BitOutput {
     }
 }
 
-// =====================================================================
 // BitInput: lê o arquivo bit a bit (inverso do BitOutput).
-// =====================================================================
+
 class BitInput {
     private final InputStream in;
     private int buffer = 0;
@@ -92,11 +89,9 @@ class BitInput {
     }
 }
 
-// =====================================================================
 // GerenciadorVersoes: padrão de nome nomeArquivo + nomeAlgoritmo + "Compressao"
-// + X
 // Ex.: jogosHuffmanCompressao1.dat
-// =====================================================================
+
 class GerenciadorVersoes {
 
     // Remove a extensão: "jogos.dat" -> "jogos"
@@ -130,7 +125,7 @@ class GerenciadorVersoes {
                     try {
                         maior = Math.max(maior, Integer.parseInt(num));
                     } catch (NumberFormatException e) {
-                        /* ignora nomes fora do padrão */ }
+                    }
                 }
             }
         }
@@ -138,9 +133,8 @@ class GerenciadorVersoes {
     }
 }
 
-// =====================================================================
 // MENU PRINCIPAL
-// =====================================================================
+
 public class Maincompressao {
 
     static final String ARQUIVO = "jogos.dat";
@@ -213,7 +207,7 @@ public class Maincompressao {
         // Teste de corretude: os dois resultados precisam ser idênticos byte a byte.
         if (!iguais(temp[0], temp[1])) {
             System.out.println("ERRO: os dois algoritmos geraram resultados diferentes. "
-                    + "Base de dados NÃO foi substituída.");
+                    + "Base de dados NAO foi substituida.");
             return;
         }
 
